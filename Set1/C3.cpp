@@ -125,7 +125,7 @@ int main() {
     // Calc min dist based on ideal frequency of characters
     char minChar;
     float minDist = FLT_MAX;
-    for(char XORChar = 'a'; XORChar <= 'z'; XORChar++) {
+    for(char XORChar = 'A'; XORChar <= 'Z'; XORChar++) {
         float dist = freqDist(input, XORChar, idealFreq).first;
         if (dist < minDist) {
             minDist = dist;
