@@ -9,33 +9,19 @@ string hexToBase64(string hexString) {
     // Convert hex to boolean array
     vector<bool> arr;
     string ret = "";
-    for(unsigned int i = 0; i < hexString.size(); i++) {
+    for(int i = 0; i < hexString.size(); i++) {
         // Hex to num
-        int num;
-        char lowerChar = tolower(hexString[i]);
-        if ('0' <= lowerChar && lowerChar <= '9') {
-            num = int(hexString[i] - '0');
-        }
-        else if ('a' <= lowerChar && lowerChar <= 'f') {
-            num = int(lowerChar - 'a') + 10;
-        } 
-        else continue;
+        int num = hexString[i] - ((hexString[i] <= '9') ? '0' : 'a' - 10);
 
         // Num to 4-bits
         for(int q = 3; q >= 0; q--) {
-            int sub = int(pow(2, q));
-            if (num >= sub) {
-                arr.push_back(1);
-                num -= sub;
-            }
-            else {
-                arr.push_back(0);
-            }
+            if (num >> q & 1) arr.push_back(1);
+            else arr.push_back(0);
         }
     }
         
     // Add padding
-    int paddingSize = (6 - (hexString.size() % 6)) % 6;
+    int paddingSize = (6 - hexString.size() % 6) % 6;
     for(int i = 0; i < paddingSize * 4; i++) {
         arr.push_back(0);
     }
@@ -47,34 +33,23 @@ string hexToBase64(string hexString) {
     for(int i = 0; i < arr.size(); i += 6) {
         // Get block value
         int num = 0;
-        for(int q = 0; q < 6; q++) {
+        for(int q = 0; q < 6; q++)
             num += int(pow(2, 5 - q)) * int(arr[i + q]);
-        }
 
-        // Convert to num
+        // Convert to table value
         char appendChar;
-        if (0 <= num && num <= 25) {
-            appendChar = char('A' + num);
-        }
-        else if (26 <= num && num <= 51) {
-            appendChar = char('a' + num - 26);
-        }
-        else if (52 <= num && num <= 61) {
-            appendChar = char('0' + num - 52);
-        }
-        else if (num == 62) {
-            appendChar = '+';
-        }
-        else if (num == 63) {
-            appendChar = '/';
-        }
+        if (0 <= num && num <= 25) appendChar = char('A' + num);
+        else if (26 <= num && num <= 51) appendChar = char('a' + num - 26);
+        else if (52 <= num && num <= 61) appendChar = char('0' + num - 52);
+        else if (num == 62) appendChar = '+';
+        else if (num == 63) appendChar = '/';
 
         ret += appendChar;
     }
 
-    for(int i = 0; i < paddingSize; i++) {
+    // Pad end of string
+    for(int i = 0; i < paddingSize; i++)
         ret[ret.size() - 1 - i] = '=';
-    }
 
     return ret;
 }

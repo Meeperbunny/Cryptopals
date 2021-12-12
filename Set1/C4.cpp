@@ -4,6 +4,7 @@
 #include <sstream>
 #include <float.h>
 #include <cmath>
+#include <fstream>
 
 using namespace std;
 
@@ -119,27 +120,38 @@ int main() {
     vector<float> idealFreq = { 0.08496, 0.020720, 0.04538, 0.03384, 0.11160, 0.018121, 0.024705, 0.030034, 0.07544, 0.001965, 0.011016, 0.05489, 0.030129, 0.06654, 0.07163, 0.03167, 0.001962, 0.07580, 0.05735, 0.06950, 0.03630, 0.010074, 0.012899, 0.002902, 0.017779, 0.002722 };
     
     string input, output;
-    cout << "Enter encoded string: ";
-    cin >> input;
+    ifstream fin;
+    fin.open("4.txt");
     
     // Calc min dist based on ideal frequency of characters
-    char minChar;
-    float minDist = FLT_MAX;
-    for(char XORChar = 32; XORChar <= 126; XORChar++) {
-        pair<float, string> ret = freqDist(input, XORChar, idealFreq);
-        bool isValid = true;
-        for(int i = 0; i < ret.second.size(); i++) {
-            if (32 <= ret.second[i] && ret.second[i] <= 126) {
-                // Valid
-            } else {
-                isValid = false;
-                break;
+    float mingGlobalDist = FLT_MAX;
+    while(fin >> input) {
+        float minDist = FLT_MAX;
+        char minChar;
+        string localMin;
+        for(unsigned char XORChar = 0; XORChar <= 254; XORChar++) {
+            pair<float, string> ret = freqDist(input, XORChar, idealFreq);
+            bool isValid = true;
+            for(int i = 0; i < ret.second.size(); i++) {
+                if (32 <= ret.second[i] && ret.second[i] <= 126) {
+                    // Valid
+                } else {
+                    isValid = false;
+                    break;
+                }
+            }
+            if (isValid) {
+                cout << ret.second << endl;
+            }
+            if (isValid && ret.first < minDist) {
+                minDist = ret.first;
+                minChar = XORChar;
+                localMin = ret.second;
             }
         }
-        if (isValid && ret.first < minDist) {
-            minDist = ret.first;
-            minChar = XORChar;
-            output = ret.second;
+        if (minDist < mingGlobalDist) {
+            mingGlobalDist = minDist;
+            output = localMin;
         }
     }
 
