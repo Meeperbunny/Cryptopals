@@ -29,3 +29,5 @@ string stringToHexString(string s);
 pair<float, string> freqDist(string s, string c, vector<float> idealFreq);
 
 bool isValidString(string s, float threshold);
+
+int hammingDistance(string a, string b);

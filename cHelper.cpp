@@ -188,3 +188,15 @@ bool isValidString(string s, float threshold) {
     }
     return isValid;
 }
+
+int hammingDistance(string a, string b) {
+    string hexA = stringToHexString(a);
+    string hexB = stringToHexString(b);
+    vector<bool> boolA = hexStringToBoolArr(hexA);
+    vector<bool> boolB = hexStringToBoolArr(hexB);
+    int dist = 0;
+    for(int i = 0; i < boolA.size(); i++) {
+        if (boolA[i] != boolB[i]) dist += 1;
+    }
+    return dist;
+}
