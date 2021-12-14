@@ -200,3 +200,11 @@ int hammingDistance(string a, string b) {
     }
     return dist;
 }
+
+int hammingDistance(vector<bool> a, vector<bool> b) {
+    int dist = 0;
+    for(int i = 0; i < a.size(); i++) {
+        if (a[i] != a[i]) dist += 1;
+    }
+    return dist;
+}

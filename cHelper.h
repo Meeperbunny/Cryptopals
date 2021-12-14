@@ -31,3 +31,5 @@ pair<float, string> freqDist(string s, string c, vector<float> idealFreq);
 bool isValidString(string s, float threshold);
 
 int hammingDistance(string a, string b);
+
+int hammingDistance(vector<bool> a, vector<bool> b);
