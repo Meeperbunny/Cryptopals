@@ -5,10 +5,13 @@
 #include <float.h>
 #include <cmath>
 #include <fstream>
+#include <algorithm>
 
 using namespace std;
 
 string hexToBase64(string hexString);
+
+string base64DecryptToHex(string s);
 
 vector<bool> hexStringToBoolArr(string s);
 
@@ -26,10 +29,12 @@ string repeatStringXORString(string s, string key);
 
 string stringToHexString(string s);
 
-pair<float, string> freqDist(string s, string c, vector<float> idealFreq);
+pair<float, string> freqDist(string s, string c);
 
 bool isValidString(string s, float threshold);
 
 int hammingDistance(string a, string b);
 
 int hammingDistance(vector<bool> a, vector<bool> b);
+
+

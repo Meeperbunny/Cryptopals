@@ -1,5 +1,6 @@
 #include "cHelper.h"
 
+
 string hexToBase64(string hexString) {
     // Convert hex to boolean array
     vector<bool> arr;
@@ -47,6 +48,36 @@ string hexToBase64(string hexString) {
         ret[ret.size() - 1 - i] = '=';
 
     return ret;
+}
+
+string base64DecryptToHex(string base64String) {
+    vector<bool> boolArr;
+
+    // Iterate through each num, and convert to a bool array
+    int padCnt = 0;
+    for(int i = 0; i < base64String.size(); i++) {
+        char curr = base64String[i];
+        if (curr == '=') padCnt++;
+        int num = -1;
+        if ('A' <= curr && curr <= 'Z') num = int(curr - 'A');
+        else if ('a' <= curr && curr <= 'z') num = int(curr - 'a' + 26);
+        else if ('0' <= curr && curr <= '9') num = int(curr - '0' + 52);
+        else if (curr == '+') num = 62;
+        else if (curr == '/') num = 63;
+
+        for(int i = 5; i >= 0; i--) {
+            if (num >> i & 1 && curr != '=') boolArr.push_back(1);
+            else {
+                boolArr.push_back(0);
+            }
+        }
+    }
+
+    // Remove padding
+    for(int i = 0; i < padCnt * 8; i++) boolArr.pop_back();
+
+    // Convert bool to hex string
+    return boolArrToHexString(boolArr);
 }
 
 vector<bool> hexStringToBoolArr(string s) {
@@ -160,7 +191,8 @@ string stringToHexString(string s) {
     return ret;
 }
 
-pair<float, string> freqDist(string s, string c, vector<float> idealFreq) {
+pair<float, string> freqDist(string s, string c) {
+    vector<float> idealFreq = { 0.08496, 0.020720, 0.04538, 0.03384, 0.11160, 0.018121, 0.024705, 0.030034, 0.07544, 0.001965, 0.011016, 0.05489, 0.030129, 0.06654, 0.07163, 0.03167, 0.001962, 0.07580, 0.05735, 0.06950, 0.03630, 0.010074, 0.012899, 0.002902, 0.017779, 0.002722 };
     string first = s;
     string second = "";
 
@@ -204,7 +236,9 @@ int hammingDistance(string a, string b) {
 int hammingDistance(vector<bool> a, vector<bool> b) {
     int dist = 0;
     for(int i = 0; i < a.size(); i++) {
-        if (a[i] != a[i]) dist += 1;
+        if (a[i] != b[i]) dist += 1;
     }
     return dist;
 }
+
+
