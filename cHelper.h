@@ -1,3 +1,6 @@
+#ifndef CHELPER
+#define CHELPER
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -6,6 +9,7 @@
 #include <cmath>
 #include <fstream>
 #include <algorithm>
+#define ROTL8(x,shift) ((uint8_t) ((x) << (shift)) | ((x) >> (8 - (shift))))
 
 using namespace std;
 
@@ -37,4 +41,25 @@ int hammingDistance(string a, string b);
 
 int hammingDistance(vector<bool> a, vector<bool> b);
 
+uint8_t hexToByte(string hex);
 
+vector<uint8_t> hexToByteArr(string hex);
+
+namespace AES {
+    vector<uint8_t> AES128Decrypt(vector<uint8_t> block, string key);
+    
+    void shiftRow(vector<uint8_t> &block, char mode);
+    
+    void byteSub(vector<uint8_t> &block, char mode);
+    
+    void addRound(vector<uint8_t> &block);
+    
+    void mixCol(vector<uint8_t> &block, char mode);
+
+    namespace Helpers {
+        extern uint8_t E[256];
+        extern uint8_t L[256];
+    }
+}
+
+#endif
