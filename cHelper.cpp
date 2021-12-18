@@ -297,7 +297,7 @@ vector<uint8_t> initialize_aes_sbox(char mode) {
 
 // AES FUNCTIONS
 
-void AES::shiftRow(vector<uint8_t> &block, char mode) {
+void AES::shiftRow(vector<uint8_t> &block, char mode, bool DEBUG) {
     vector<uint8_t> cp(block);
     int offset = (mode == 'E') ? 5 : 13;
     for(int i = 0; i < block.size(); i++) {
@@ -306,7 +306,7 @@ void AES::shiftRow(vector<uint8_t> &block, char mode) {
     return;
 }
 
-void AES::byteSub(vector<uint8_t> &block, char mode) {
+void AES::byteSub(vector<uint8_t> &block, char mode, bool DEBUG) {
     // Get sBox
     vector<uint8_t> sBox = initialize_aes_sbox(mode);
 
@@ -317,11 +317,40 @@ void AES::byteSub(vector<uint8_t> &block, char mode) {
     return;
 }
 
-void AES::addRound(vector<uint8_t> &block) {
-    
+void AES::addRound(vector<uint8_t> &block, vector<uint8_t> &eKey, string key, int round, char mode, bool DEBUG) {
+    if (DEBUG) cout << "--------Getting expanded key" << endl;
+
+    for(int i = 0; i < 4; i++) {
+        AES::Helpers::getExpandedKey(eKey, key, 4 * round + i, mode);
+    }
+
+    if (DEBUG) cout << "--------Expanded key aquired" << endl;
+    if (DEBUG) cout << "--------eKey: ";
+    if (DEBUG) for(int i = 0; i < eKey.size(); i++) cout << eKey[i] << ' ';
+    if (DEBUG) cout << endl << "--------" << endl;
+
+    vector<uint8_t> currEKey(eKey.begin() + round * 16, eKey.begin() + round * 16 + 16);
+
+    if (DEBUG) cout << "--------currEKey: ";
+    if (DEBUG) for(int i = 0; i < currEKey.size(); i++) cout << int(currEKey[i]) << ' ';
+    if (DEBUG) cout << endl << "--------" << endl;
+
+    if (DEBUG) cout << "--------Starting XOR..." << endl;;
+
+    for(int i = 0; i < block.size(); i++) {
+        block[i] = block[i] ^ currEKey[i];
+    }
+
+if (DEBUG) cout << "--------New block: ";
+    if (DEBUG) for(int i = 0; i < block.size(); i++) cout << int(block[i]) << ' ';
+    if (DEBUG) cout << endl << "--------" << endl;
+
+    if (DEBUG) cout << "--------Finished XOR, returning" << endl;;
+
+    return;
 }
 
-void AES::mixCol(vector<uint8_t> &block, char mode) {
+void AES::mixCol(vector<uint8_t> &block, char mode, bool DEBUG) {
     vector<uint8_t> mMat = {
         0x02, 0x03, 0x01, 0x01,
         0x01, 0x02, 0x03, 0x01,
@@ -353,22 +382,127 @@ void AES::mixCol(vector<uint8_t> &block, char mode) {
     return;
 }
 
-vector<uint8_t> AES::AES128Decrypt(vector<uint8_t> block, string key) {
+vector<uint8_t> AES::AES128Decrypt(vector<uint8_t> block, string key, bool DEBUG) {
     char mode = 'D';
+    vector<uint8_t> eKey;
     const int rounds = 10;
 
-    AES::addRound(block);
-    
-    for(int i = 0; i < rounds; i++) {
-        shiftRow(block, mode);
-        byteSub(block, mode);
-        addRound(block);
-        if (i != rounds - 1) // Mix col every round except last
-            mixCol(block, mode);
+    if (DEBUG) cout << "### Starting AES-128 Decrypt ###" << endl;
+
+    if (DEBUG) cout << "----Adding round key" << endl;
+    AES::addRound(block, eKey, key, 0, mode, DEBUG);
+
+    cout << "----Finished initial addRound, starting main loop" << endl;
+
+    DEBUG = false; // TESTING $$$$$$$$$$$$$$$$
+
+    for(int round = 1; round <= rounds; round++) {
+        shiftRow(block, mode, DEBUG);
+        byteSub(block, mode, DEBUG);
+        addRound(block, eKey, key, round, mode, DEBUG);
+        if (round != rounds) // Mix col every round except last
+            mixCol(block, mode, DEBUG);
     }
 
     return block;
 }
+
+// Helper functions
+
+void AES::Helpers::rotWord(vector<uint8_t> &bytes) {
+    vector<uint8_t> cp(bytes);
+    for(int i = 0; i < bytes.size(); i++) {
+        bytes[i] = cp[(i + 1) % cp.size()];
+    }
+    return;
+}
+
+void AES::Helpers::subWord(vector<uint8_t> &bytes, char mode) {
+    // Get sBox
+    vector<uint8_t> sBox = initialize_aes_sbox(mode);
+
+    // Sub bytes
+    for(int i = 0; i < bytes.size(); i++) {
+        bytes[i] = sBox[bytes[i]];
+    }
+    return;
+}
+
+void AES::Helpers::getExpandedKey(vector<uint8_t> &eKey, string key, int round, char mode) {
+    vector<uint8_t> temp(4, 0);
+    if (round < 4) {
+        cout << round * 4 << endl;
+        temp = AES::Helpers::K(key, 4 * round);
+    }
+    else if (round % 4 == 0) {
+        vector<uint8_t> first = AES::Helpers::EK(eKey, (round - 1) * 4);
+        AES::Helpers::rotWord(first);
+        AES::Helpers::subWord(first, mode);
+        vector<uint8_t> second = AES::Helpers::rCon((round / 4) - 1);
+        vector<uint8_t> third = AES::Helpers::EK(eKey, (round - 4) * 4);
+
+        for(int i = 0; i < first.size(); i++) {
+            temp[i] = first[i] ^ second[i] ^ third[i];
+        }
+    } 
+    else {
+        vector<uint8_t> first = AES::Helpers::EK(eKey, (round - 1) * 4);
+        vector<uint8_t> second = AES::Helpers::EK(eKey, (round - 4) * 4);
+        
+        for(int i = 0; i < first.size(); i++) {
+            temp[i] = first[i] ^ second[i];
+        }
+    }
+
+    for(int i = 0; i < temp.size(); i++) {
+        eKey.push_back(temp[i]);
+    }
+    return;
+}
+
+vector<uint8_t> AES::Helpers::rCon(int n) {
+
+    vector<vector<uint8_t>> table = {
+        {0x01, 0x00, 0x00, 0x00},
+        {0x02, 0x00, 0x00, 0x00},
+        {0x04, 0x00, 0x00, 0x00},
+        {0x08, 0x00, 0x00, 0x00},
+        {0x10, 0x00, 0x00, 0x00},
+        {0x20, 0x00, 0x00, 0x00},
+        {0x40, 0x00, 0x00, 0x00},
+        {0x80, 0x00, 0x00, 0x00},
+        {0x1B, 0x00, 0x00, 0x00},
+        {0x36, 0x00, 0x00, 0x00},
+        {0x6C, 0x00, 0x00, 0x00},
+        {0xD8, 0x00, 0x00, 0x00},
+        {0xAB, 0x00, 0x00, 0x00},
+        {0x4D, 0x00, 0x00, 0x00},
+        {0x9A, 0x00, 0x00, 0x00}
+    };
+
+    return table[n];
+}
+
+vector<uint8_t> AES::Helpers::EK(vector<uint8_t> eKey, int n) {
+    vector<uint8_t> ret;
+    vector<uint8_t> subEKey(eKey.begin() + n, eKey.begin() + n + 4);
+    for(int i = 0; i < subEKey.size(); i++) {
+        ret.push_back(subEKey[i]);
+    }
+    return ret;
+}
+
+vector<uint8_t> AES::Helpers::K(string key, int n) {
+    vector<uint8_t> ret;
+    string rel = key.substr(n, 4);
+    for(int i = 0; i < rel.size(); i++) {
+        ret.push_back(uint8_t(rel[i]));
+    }
+    return ret;
+}
+
+
+
 
 uint8_t AES::Helpers::E[256] = {
     0x01, 0x03, 0x05, 0x0F, 0x11, 0x33, 0x55, 0xFF, 0x1A, 0x2E, 0x72, 0x96, 0xA1, 0xF8, 0x13, 0x35,

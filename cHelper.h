@@ -46,17 +46,22 @@ uint8_t hexToByte(string hex);
 vector<uint8_t> hexToByteArr(string hex);
 
 namespace AES {
-    vector<uint8_t> AES128Decrypt(vector<uint8_t> block, string key);
+    vector<uint8_t> AES128Decrypt(vector<uint8_t> block, string key, bool DEBUG);
     
-    void shiftRow(vector<uint8_t> &block, char mode);
-    
-    void byteSub(vector<uint8_t> &block, char mode);
-    
-    void addRound(vector<uint8_t> &block);
-    
-    void mixCol(vector<uint8_t> &block, char mode);
+    void shiftRow(vector<uint8_t> &block, char mode, bool DEBUG);
+    void byteSub(vector<uint8_t> &block, char mode, bool DEBUG);
+    void addRound(vector<uint8_t> &block, vector<uint8_t> &eKey, string key, int round, char mode, bool DEBUG);
+    void mixCol(vector<uint8_t> &block, char mode, bool DEBUG);
 
     namespace Helpers {
+        void rotWord(vector<uint8_t> &bytes);
+        void subWord(vector<uint8_t> &bytes, char mode);
+        void getExpandedKey(vector<uint8_t> &eKey, string key, int round, char mode);
+        vector<uint8_t> rCon(int n);
+
+        vector<uint8_t> EK(vector<uint8_t> eKey, int n);
+        vector<uint8_t> K(string key, int n);
+
         extern uint8_t E[256];
         extern uint8_t L[256];
     }
