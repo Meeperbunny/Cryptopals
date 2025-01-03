@@ -42,7 +42,7 @@ Bytestring BytestringFromHex(std::string hexString) {
 }
 
 Bytestring Bytestring::operator^(Bytestring &other) {
-    Bytestring a(1, *this), b(1, other);
+    Bytestring a(8, *this), b(8, other);
     if (a.size() < b.size()) std::swap(a, b);
 
     for(int i = 0; i < b.size(); ++i) {
@@ -59,4 +59,12 @@ std::string Bytestring::toHexString() {
         hex += utils::IntToHexChar(std::to_integer<int>(b[i]));
     }
     return hex;
+}
+
+std::string Bytestring::toAsciiString() {
+    std::string s{};
+    for(int i = 0; i < m_data.size(); ++i) {
+        s += std::to_integer<char>(m_data[i]);
+    }
+    return s;
 }

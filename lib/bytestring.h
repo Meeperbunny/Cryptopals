@@ -20,6 +20,7 @@ public:
     std::byte& operator[](int i) { return m_data[i]; }
     Bytestring operator^(Bytestring &other);
     std::string toHexString();
+    std::string toAsciiString();
 };
 
 Bytestring BytestringFromHex(std::string hexString);
