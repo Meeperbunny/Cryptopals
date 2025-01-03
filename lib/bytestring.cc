@@ -2,6 +2,7 @@
 #include "lib/utils.h"
 
 #include <iostream>
+#include <algorithm>
 
 Bytestring::Bytestring() 
     : m_base(8) {}
@@ -38,4 +39,24 @@ Bytestring BytestringFromHex(std::string hexString) {
     }
     Bytestring hexBytestring(4, data);
     return Bytestring(8, hexBytestring);
+}
+
+Bytestring Bytestring::operator^(Bytestring &other) {
+    Bytestring a(1, *this), b(1, other);
+    if (a.size() < b.size()) std::swap(a, b);
+
+    for(int i = 0; i < b.size(); ++i) {
+        a[i] ^= b[i];
+    }
+
+    return a;
+}
+
+std::string Bytestring::toHexString() {
+    Bytestring b(4, *this);
+    std::string hex{};
+    for(int i = 0; i < b.size(); ++i) {
+        hex += utils::IntToHexChar(std::to_integer<int>(b[i]));
+    }
+    return hex;
 }

@@ -1,7 +1,7 @@
 cc_binary(
     name = "main",
     srcs = [
-        "challenge_1.cc",
+        "set.cc",
     ],
     deps = [
         "//lib:lib",

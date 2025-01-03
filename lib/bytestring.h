@@ -18,6 +18,8 @@ public:
     inline int base() const { return m_base; }
     inline size_t size() const { return m_data.size(); }
     std::byte& operator[](int i) { return m_data[i]; }
+    Bytestring operator^(Bytestring &other);
+    std::string toHexString();
 };
 
 Bytestring BytestringFromHex(std::string hexString);

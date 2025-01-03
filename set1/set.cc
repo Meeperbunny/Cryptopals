@@ -17,6 +17,22 @@ void Challenge1() {
     std::cout << "Challenge one passed!" << std::endl;
 }
 
+void Challenge2() {
+    std::string inputA = "1c0111001f010100061a024b53535009181c";
+    std::string inputB = "686974207468652062756c6c277320657965";
+    std::string answer = "746865206b696420646f6e277420706c6179";
+
+    auto bsa = BytestringFromHex(inputA);
+    auto bsb = BytestringFromHex(inputB);
+
+    std::string s = (bsa ^ bsb).toHexString();
+
+    assert(s == answer);
+
+    std::cout << "Challenge two passed!" << std::endl;
+}
+
 int main() {
     Challenge1();
+    Challenge2();
 }
