@@ -2,9 +2,10 @@
 #include <string>
 #include <assert.h>
 #include <cstddef>
-#include <map>
+#include <set>
 #include <fstream>
 #include <limits.h>
+#include <iterator>
 
 #include "lib/bytestring.h"
 #include "lib/base64.h"
@@ -42,7 +43,7 @@ void Challenge2() {
 void Challenge3() {
     std::string input = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
 
-    std::cout << "Challenge three result string:\n\t" << "\"" << frequency::singleCharXORDecrypt(BytestringFromHex(input)).first << "\"" << std::endl;
+    std::cout << "Challenge three result string:\n\t" << "\"" << std::get<0>(frequency::singleCharXORDecrypt(BytestringFromHex(input))) << "\"" << std::endl;
 }
 
 void Challenge4() {
@@ -53,7 +54,7 @@ void Challenge4() {
     std::string bests;
     double bestscore = DBL_MAX;
     while(std::getline(fin, line)) {
-        auto [s, score] = frequency::singleCharXORDecrypt(BytestringFromHex(line));
+        auto [s, c, score] = frequency::singleCharXORDecrypt(BytestringFromHex(line));
         if (!s.empty()) {
             if (score < bestscore) {
                 bestscore = score;
@@ -71,8 +72,76 @@ void Challenge5() {
 
     std::cout << "Challenge five result hex:" << std::endl;
     auto bs = BytestringFromString(line);
-    auto encoded = repeatingxor::Encode(bs, key);
+    auto encoded = repeatingxor::Transform(bs, key);
     std::cout << '\t' << encoded.toHexString() << std::endl;
+}
+
+void Challenge6() {
+    // Testing hamming distance.
+    int hammingTest = utils::HammingDistance(BytestringFromString("this is a test"), BytestringFromString("wokka wokka!!!"));
+    assert(hammingTest == 37);
+    std::cout << "[TEST] Hamming distance works!" << std::endl;
+    // Testing base64 encode and decode.
+    std::string tester = "this is a test!";
+    assert(base64::Decode(base64::Encode(BytestringFromString(tester))).toAsciiString() == tester);
+    std::cout << "[TEST] Base64 works!" << std::endl;
+
+    std::ifstream fin("C:/Users/Ian McKibben/Cryptopals/set1/6.txt");
+    assert(fin.is_open());
+
+    std::string s{}, line;
+    while(std::getline(fin, line))
+        s += line;
+
+    // First need to decode the b64.
+    Bytestring decoded = base64::Decode(s);
+
+    // Maintain a record of the k smallest keysizes.
+    int k = 30;
+    std::set<std::pair<double, int>> normalizedDistToKeysize;
+
+    for(int keysize = 2; keysize <= 40; ++keysize) {
+        // Get the first keysize of bytes.
+        std::vector<std::byte> first, second;
+        for(int i = 0; i < keysize; ++i) {
+            first.push_back(decoded[i]);
+        }
+        for(int i = keysize; i < 2 * keysize; ++i) {
+            second.push_back(decoded[i]);
+        }
+
+        int dist = utils::HammingDistance(Bytestring(1, first), Bytestring(1, second));
+        double normalizedDist = double(dist) / double(keysize);
+
+        // Add new one, and get rid of the largest normalized dist.
+        normalizedDistToKeysize.insert({normalizedDist, keysize});
+        while(normalizedDistToKeysize.size() > k)
+            normalizedDistToKeysize.erase(std::prev(normalizedDistToKeysize.end()));
+    }
+
+    double bestdistance = DBL_MAX;
+    std::string bests{};
+    for(const auto &[keyscore, keysize] : normalizedDistToKeysize) {
+        std::string candidateKey{};
+        for(int i = 0; i < keysize; ++i) {
+            // Group the similar blocks.
+            std::vector<std::byte> keygroup;
+            for(int q = i; q < decoded.size(); q += keysize) {
+                keygroup.push_back(decoded[q]);
+            }
+            auto [s, c, score] = frequency::singleCharXORDecrypt(Bytestring(8, keygroup));
+            candidateKey += c;
+        }
+
+        auto text = repeatingxor::Transform(decoded, BytestringFromString(candidateKey)).toAsciiString();
+        frequency::FrequencyMap fm(text);
+        if (fm.distance() < bestdistance) {
+            bestdistance = fm.distance();
+            bests = text;
+        }
+    }
+    std::cout << "Challenge 6 result text:" << std::endl;
+    std::cout << bests << std::endl;
 }
 
 int main() {
@@ -81,4 +150,5 @@ int main() {
     Challenge3();
     Challenge4();
     Challenge5();
+    Challenge6();
 }

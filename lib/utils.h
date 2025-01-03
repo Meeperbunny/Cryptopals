@@ -1,8 +1,13 @@
 #ifndef UTILS
 #define UTILS
 
+#include <algorithm>
+#include <bit>
 #include <cstddef>
 #include <string>
+#include <assert.h>
+
+#include "lib/bytestring.h"
 
 namespace utils {
 
@@ -14,6 +19,14 @@ namespace utils {
             return false;
         return true;
     };
+    inline int HammingDistance(Bytestring a, Bytestring b) {
+        assert(a.base() == b.base());
+        int dist = 0;
+        for(int i = 0; i < std::min(a.size(), b.size()); ++i) {
+            dist += __popcnt(std::to_integer<int>(a[i] ^ b[i]));
+        }
+        return dist;
+    }
 
 } /* utils */
 

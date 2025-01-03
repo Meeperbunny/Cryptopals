@@ -7,7 +7,7 @@
 
 namespace frequency {
     extern std::unordered_map<char, double> characterFrequencies;
-    std::pair<std::string, double> singleCharXORDecrypt(Bytestring);
+    std::tuple<std::string, int, double> singleCharXORDecrypt(Bytestring);
 
     class FrequencyMap {
     private:

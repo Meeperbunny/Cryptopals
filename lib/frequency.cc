@@ -54,18 +54,21 @@ double frequency::FrequencyMap::distance() {
     double totalDistance = 0.0;
     for(const auto &[k, v] : frequency::characterFrequencies) {
         double m_v = m_map[k];
-        totalDistance += std::pow(std::abs(m_v - v), 1.5);
+        totalDistance += std::pow(std::abs(m_v - v), 1);
     }
+    double normalizedNonLowercase = 1; // Add 1 to avoid divide by 0.
     for(const auto& c : m_s) {
         if (c < 'a' || 'z' < c) {
-            totalDistance *= 1.3; // Adding penalty for non-lowercase characters because this seems to be the normal output.
+            ++normalizedNonLowercase; // Adding penalty for non-lowercase characters because this seems to be the normal output.
         }
     }
-    return totalDistance;
+    normalizedNonLowercase /= m_s.size();
+
+    return totalDistance * (normalizedNonLowercase);
 }
 
-std::pair<std::string, double> frequency::singleCharXORDecrypt(Bytestring bs) {
-    std::map<double, std::string> frequencyScoreMap;
+std::tuple<std::string, int, double> frequency::singleCharXORDecrypt(Bytestring bs) {
+    std::map<double, std::pair<int, std::string>> frequencyScoreMap;
 
     for(int i = 0; i < 256; i++) {
         auto bytevec = std::vector<std::byte>(bs.size(), std::byte(char(i)));
@@ -76,11 +79,11 @@ std::pair<std::string, double> frequency::singleCharXORDecrypt(Bytestring bs) {
         if (!utils::IsValidAsciiString(s))
             continue;
 
-        frequencyScoreMap.insert({frequency::FrequencyMap(s).distance(), s});
+        frequencyScoreMap.insert({frequency::FrequencyMap(s).distance(), {i, s}});
     }
 
     if (frequencyScoreMap.empty())
-        return {"", 0.0};
+        return {"", '\0', 0.0};
 
-    return {frequencyScoreMap.begin()->second, frequencyScoreMap.begin()->first};
+    return {frequencyScoreMap.begin()->second.second, frequencyScoreMap.begin()->second.first, frequencyScoreMap.begin()->first};
 }

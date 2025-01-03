@@ -2,6 +2,7 @@
 #include "lib/base64.h"
 
 #include <cstddef>
+#include <unordered_map>
 
 char base64::lookup[64] = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
@@ -30,5 +31,16 @@ std::string base64::Encode(Bytestring b, bool padding /* true */) {
 }
 
 Bytestring base64::Decode(std::string s) {
-    return Bytestring();
+    // For each character that is not padding, do a reverse lookup and put it into a base 6 bytestring. Then convert at the end.
+    std::unordered_map<char, int> reverseLookup;
+    for(int i = 0; i < 64; ++i) {
+        reverseLookup.insert({base64::lookup[i], i});
+    }
+    std::vector<std::byte> v;
+    for(const auto& c : s) {
+        if (c == '=') continue;
+        v.push_back(std::byte(reverseLookup[c]));
+    }
+    auto b = Bytestring(6, v);
+    return Bytestring(8, b);
 }

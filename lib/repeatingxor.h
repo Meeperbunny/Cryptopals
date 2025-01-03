@@ -5,7 +5,7 @@
 
 namespace repeatingxor {
 
-    Bytestring Encode(Bytestring text, Bytestring key);
+    Bytestring Transform(Bytestring text, Bytestring key);
 
 } /* repeatingxor */
 
