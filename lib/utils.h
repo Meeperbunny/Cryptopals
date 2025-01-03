@@ -1,6 +1,7 @@
 #ifndef UTILS
 #define UTILS
 
+#include <iostream>
 #include <algorithm>
 #include <bit>
 #include <cstddef>

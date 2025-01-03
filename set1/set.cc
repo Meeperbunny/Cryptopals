@@ -12,6 +12,7 @@
 #include "lib/frequency.h"
 #include "lib/utils.h"
 #include "lib/repeatingxor.h"
+#include "lib/aes128.h"
 
 void Challenge1() {
     std::string input = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
@@ -144,6 +145,34 @@ void Challenge6() {
     std::cout << bests << std::endl;
 }
 
+void Challenge7() {
+    std::vector<int> v = {0x54, 0x68, 0x61, 0x74, 0x73, 0x20, 0x6D, 0x79, 0x20, 0x4B, 0x75, 0x6E, 0x67, 0x20, 0x46, 0x75};
+    std::vector<std::byte> byteVec;
+    for(auto &e : v)
+        byteVec.push_back(std::byte(e));
+    Bytestring keyTest(8, byteVec);
+
+    std::cout << "Initial key: " << keyTest.toHexString() << std::endl;
+    for(int round = 1; round <= aes128::rounds; ++round) {
+        keyTest = aes128::nextRoundKey(keyTest, round);
+    }
+    std::cout << "Round 10 key: " << keyTest.toHexString() << std::endl;
+    assert(keyTest.toHexString() == "28fddef86da4244accc0a4fe3b316f26");
+
+    std::cout << "[TEST] Rotkey works!" << std::endl;
+
+    auto key = BytestringFromString("YELLOW SUBMARINE");
+    
+    std::ifstream fin("C:/Users/Ian McKibben/Cryptopals/set1/7.txt");
+    assert(fin.is_open());
+
+    std::string s{}, line;
+    while(std::getline(fin, line))
+        s += line;
+
+    Bytestring decoded = base64::Decode(s);
+}
+
 int main() {
     Challenge1();
     Challenge2();
@@ -151,4 +180,5 @@ int main() {
     Challenge4();
     Challenge5();
     Challenge6();
+    Challenge7();
 }

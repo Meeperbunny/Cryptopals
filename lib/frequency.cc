@@ -56,15 +56,15 @@ double frequency::FrequencyMap::distance() {
         double m_v = m_map[k];
         totalDistance += std::pow(std::abs(m_v - v), 1);
     }
-    double normalizedNonLowercase = 1; // Add 1 to avoid divide by 0.
+    double normalizedNonLowercasePenalty = 0;
     for(const auto& c : m_s) {
         if (c < 'a' || 'z' < c) {
-            ++normalizedNonLowercase; // Adding penalty for non-lowercase characters because this seems to be the normal output.
+            ++normalizedNonLowercasePenalty; // Adding penalty for non-lowercase characters because this seems to be the normal output.
         }
     }
-    normalizedNonLowercase /= m_s.size();
+    normalizedNonLowercasePenalty /= m_s.size();
 
-    return totalDistance * (normalizedNonLowercase);
+    return totalDistance * normalizedNonLowercasePenalty;
 }
 
 std::tuple<std::string, int, double> frequency::singleCharXORDecrypt(Bytestring bs) {

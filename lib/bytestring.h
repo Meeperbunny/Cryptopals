@@ -19,8 +19,12 @@ public:
     inline size_t size() const { return m_data.size(); }
     std::byte& operator[](int i) { return m_data[i]; }
     Bytestring operator^(Bytestring &other);
+    Bytestring circularLeftShift(int n);
+    Bytestring circularRightShift(int n);
     std::string toHexString();
     std::string toAsciiString();
+    Bytestring substring(int i, int sz);
+    void extend(Bytestring &other);
 };
 
 Bytestring BytestringFromString(std::string s);

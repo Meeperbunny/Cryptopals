@@ -60,6 +60,28 @@ Bytestring Bytestring::operator^(Bytestring &other) {
     return a;
 }
 
+Bytestring Bytestring::circularLeftShift(int n) {
+    int sz = m_data.size();
+    n %= sz;
+    std::byte tmp(m_data[(sz + n - 1) % sz]);
+    for(int i = 0; i < sz - 1; ++i) {
+        m_data[i] = m_data[(i + n) % sz];
+    }
+    m_data.back() = tmp;
+    return *this;
+}
+
+Bytestring Bytestring::circularRightShift(int n) {
+    int sz = m_data.size();
+    n %= sz;
+    std::byte tmp(m_data[(sz + sz - n - 1) % sz]);
+    for(int i = 0; i < sz - 1; ++i) {
+        m_data[i] = m_data[(sz + i - n) % sz];
+    }
+    m_data.back() = tmp;
+    return *this;
+}
+
 std::string Bytestring::toHexString() {
     Bytestring b(4, *this);
     std::string hex{};
@@ -75,4 +97,15 @@ std::string Bytestring::toAsciiString() {
         s += std::to_integer<unsigned char>(m_data[i]);
     }
     return s;
+}
+
+Bytestring Bytestring::substring(int i, int sz) {
+    assert(i + sz <= m_data.size());
+    std::vector<std::byte> data(m_data.begin() + i, m_data.begin() + i + sz);
+    return Bytestring(m_base, data);
+}
+
+void Bytestring::extend(Bytestring &other) {
+    assert(m_base == other.m_base);
+    m_data.insert(m_data.end(), other.m_data.begin(), other.m_data.end());
 }
