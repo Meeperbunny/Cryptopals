@@ -23,6 +23,7 @@ public:
     std::string toAsciiString();
 };
 
+Bytestring BytestringFromString(std::string s);
 Bytestring BytestringFromHex(std::string hexString);
 
 #endif /* BYTESTRING */

@@ -10,6 +10,7 @@
 #include "lib/base64.h"
 #include "lib/frequency.h"
 #include "lib/utils.h"
+#include "lib/repeatingxor.h"
 
 void Challenge1() {
     std::string input = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
@@ -63,9 +64,21 @@ void Challenge4() {
     std::cout << "Challenge four result string:\n\t" << "\"" << bests << "\"" << std::endl;
 }
 
+void Challenge5() {
+    std::string line = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
+
+    Bytestring key = BytestringFromString("ICE");
+
+    std::cout << "Challenge five result hex:" << std::endl;
+    auto bs = BytestringFromString(line);
+    auto encoded = repeatingxor::Encode(bs, key);
+    std::cout << '\t' << encoded.toHexString() << std::endl;
+}
+
 int main() {
     Challenge1();
     Challenge2();
     Challenge3();
     Challenge4();
+    Challenge5();
 }

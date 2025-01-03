@@ -41,6 +41,14 @@ Bytestring BytestringFromHex(std::string hexString) {
     return Bytestring(8, hexBytestring);
 }
 
+Bytestring BytestringFromString(std::string s) {
+    std::vector<std::byte> data;
+    for(const auto &c : s) {
+        data.push_back(std::byte(c));
+    }
+    return Bytestring(8, data);
+}
+
 Bytestring Bytestring::operator^(Bytestring &other) {
     Bytestring a(8, *this), b(8, other);
     if (a.size() < b.size()) std::swap(a, b);
