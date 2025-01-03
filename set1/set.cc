@@ -3,6 +3,8 @@
 #include <assert.h>
 #include <cstddef>
 #include <map>
+#include <fstream>
+#include <limits.h>
 
 #include "lib/bytestring.h"
 #include "lib/base64.h"
@@ -39,29 +41,31 @@ void Challenge2() {
 void Challenge3() {
     std::string input = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
 
-    auto bs = BytestringFromHex(input);
+    std::cout << "Challenge three result string:\n\t" << "\"" << frequency::singleCharXORDecrypt(BytestringFromHex(input)).first << "\"" << std::endl;
+}
 
-    std::map<double, std::string> frequencyScoreMap;
+void Challenge4() {
+    std::ifstream fin("C:/Users/Ian McKibben/Cryptopals/set1/4.txt");
+    assert(fin.is_open());
+    std::string line;
 
-    for(int i = 0; i < 256; i++) {
-        auto bytevec = std::vector<std::byte>(bs.size(), std::byte(char(i)));
-        auto mask = Bytestring(8, bytevec);
-        std::string s = (mask ^ bs).toAsciiString();
-
-        // Assuming that this should just have all ascii values.
-        if (!utils::IsValidAsciiString(s))
-            continue;
-
-        frequencyScoreMap.insert({frequency::FrequencyMap(s).distance(), s});
+    std::string bests;
+    double bestscore = DBL_MAX;
+    while(std::getline(fin, line)) {
+        auto [s, score] = frequency::singleCharXORDecrypt(BytestringFromHex(line));
+        if (!s.empty()) {
+            if (score < bestscore) {
+                bestscore = score;
+                bests = s;
+            }
+        }
     }
-
-    assert(frequencyScoreMap.size() != 0, "Frequency score map is empty");
-
-    std::cout << "Challenge three result string:\n\t" << "\"" << frequencyScoreMap.begin()->second << "\"" << std::endl;
+    std::cout << "Challenge four result string:\n\t" << "\"" << bests << "\"" << std::endl;
 }
 
 int main() {
     Challenge1();
     Challenge2();
     Challenge3();
+    Challenge4();
 }

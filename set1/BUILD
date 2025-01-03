@@ -5,5 +5,9 @@ cc_binary(
     ],
     deps = [
         "//lib:lib",
+        "@bazel_tools//tools/cpp/runfiles",
     ],
+    data = [
+        "4.txt",
+    ]
 )

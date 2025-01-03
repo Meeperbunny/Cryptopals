@@ -64,7 +64,7 @@ std::string Bytestring::toHexString() {
 std::string Bytestring::toAsciiString() {
     std::string s{};
     for(int i = 0; i < m_data.size(); ++i) {
-        s += std::to_integer<char>(m_data[i]);
+        s += std::to_integer<unsigned char>(m_data[i]);
     }
     return s;
 }

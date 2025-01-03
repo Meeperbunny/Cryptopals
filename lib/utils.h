@@ -2,6 +2,7 @@
 #define UTILS
 
 #include <cstddef>
+#include <string>
 
 namespace utils {
 
@@ -9,7 +10,7 @@ namespace utils {
     inline char IntToHexChar(int i) { return int(i >= 10 ? i + 'a' - 10 : i + '0'); }
     inline std::byte HexToByte(char c) { return std::byte(HexCharToInt(c)); };
     inline bool IsValidAsciiString(std::string s) {
-        for(const auto &c : s) if (c < 32 || c > 126)
+        for(const auto &c : s) if (c < 0 || c > 128)
             return false;
         return true;
     };

@@ -1,7 +1,11 @@
 #include "lib/frequency.h"
+#include "lib/bytestring.h"
+#include "lib/utils.h"
 
 #include <cctype>
 #include <cmath>
+#include <map>
+#include <utility>
 
 std::unordered_map<char, double> frequency::characterFrequencies = {
     {'a', 0.082},
@@ -33,6 +37,7 @@ std::unordered_map<char, double> frequency::characterFrequencies = {
 };
 
 frequency::FrequencyMap::FrequencyMap(const std::string &s) {
+    m_s = s;
     for(const auto &c : s) {
         ++m_map[std::tolower(c)];
     }
@@ -49,7 +54,33 @@ double frequency::FrequencyMap::distance() {
     double totalDistance = 0.0;
     for(const auto &[k, v] : frequency::characterFrequencies) {
         double m_v = m_map[k];
-        totalDistance += std::abs(m_v - v);
+        totalDistance += std::pow(std::abs(m_v - v), 1.5);
+    }
+    for(const auto& c : m_s) {
+        if (c < 'a' || 'z' < c) {
+            totalDistance *= 1.3; // Adding penalty for non-lowercase characters because this seems to be the normal output.
+        }
     }
     return totalDistance;
+}
+
+std::pair<std::string, double> frequency::singleCharXORDecrypt(Bytestring bs) {
+    std::map<double, std::string> frequencyScoreMap;
+
+    for(int i = 0; i < 256; i++) {
+        auto bytevec = std::vector<std::byte>(bs.size(), std::byte(char(i)));
+        auto mask = Bytestring(8, bytevec);
+        std::string s = (mask ^ bs).toAsciiString();
+
+        // Assuming that this should just have all ascii values.
+        if (!utils::IsValidAsciiString(s))
+            continue;
+
+        frequencyScoreMap.insert({frequency::FrequencyMap(s).distance(), s});
+    }
+
+    if (frequencyScoreMap.empty())
+        return {"", 0.0};
+
+    return {frequencyScoreMap.begin()->second, frequencyScoreMap.begin()->first};
 }
