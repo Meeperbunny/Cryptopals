@@ -1,2 +1,2 @@
-# cryptopals
-Cryptopals challenges
+# Cryptopals
+Learning cpp through Cryptopals!
