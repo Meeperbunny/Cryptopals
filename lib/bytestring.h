@@ -25,6 +25,7 @@ public:
     std::string toAsciiString();
     Bytestring substring(int i, int sz);
     void extend(Bytestring &other);
+    void extend(std::byte &other);
 };
 
 Bytestring BytestringFromString(std::string s);

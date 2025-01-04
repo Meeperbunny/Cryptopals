@@ -152,16 +152,33 @@ void Challenge7() {
         byteVec.push_back(std::byte(e));
     Bytestring keyTest(8, byteVec);
 
-    std::cout << "Initial key: " << keyTest.toHexString() << std::endl;
     for(int round = 1; round <= aes128::rounds; ++round) {
         keyTest = aes128::nextRoundKey(keyTest, round);
     }
-    std::cout << "Round 10 key: " << keyTest.toHexString() << std::endl;
+    // Checking that a test key works.
     assert(keyTest.toHexString() == "28fddef86da4244accc0a4fe3b316f26");
 
     std::cout << "[TEST] Rotkey works!" << std::endl;
 
-    auto key = BytestringFromString("YELLOW SUBMARINE");
+    int a = 0b1101, b = 0b11;
+    assert(utils::PolyMult(a, b) == 0b10111);
+    std::cout << "[TEST] PolyMult works!" << std::endl;
+
+    std::string testKey = "Thats my Kung Fu";
+    std::string testText = "Two One Nine Two";
+
+    auto testKeyBs = BytestringFromString(testKey);
+    auto testTextBs = BytestringFromString(testText);
+
+    auto testEncoded = aes128::Encode(testTextBs, testKeyBs);
+    assert(testEncoded.toHexString() == "29c3505f571420f6402299b31a02d73a");
+    std::cout << "[TEST] Encode works!" << std::endl;
+
+    auto testDecoded = aes128::Decode(testEncoded, testKeyBs);
+    assert(testDecoded.toAsciiString() == testText);
+    std::cout << "[TEST] Decode works!" << std::endl;
+
+    auto keyBs = BytestringFromString("YELLOW SUBMARINE");
     
     std::ifstream fin("C:/Users/Ian McKibben/Cryptopals/set1/7.txt");
     assert(fin.is_open());
@@ -170,7 +187,10 @@ void Challenge7() {
     while(std::getline(fin, line))
         s += line;
 
-    Bytestring decoded = base64::Decode(s);
+    Bytestring text = base64::Decode(s);
+    Bytestring decoded = aes128::Decode(text, keyBs);
+    std::cout << "Challenge 7 result text:" << std::endl;
+    std::cout << decoded.toAsciiString() << std::endl;
 }
 
 int main() {

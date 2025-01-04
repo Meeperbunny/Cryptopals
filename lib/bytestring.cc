@@ -61,25 +61,41 @@ Bytestring Bytestring::operator^(Bytestring &other) {
 }
 
 Bytestring Bytestring::circularLeftShift(int n) {
-    int sz = m_data.size();
+    Bytestring b(*this);
+    int sz = b.m_data.size();
+    if (!sz) return b;
     n %= sz;
-    std::byte tmp(m_data[(sz + n - 1) % sz]);
-    for(int i = 0; i < sz - 1; ++i) {
-        m_data[i] = m_data[(i + n) % sz];
+    // Save the first n because they will be overwritten.
+    std::vector<std::byte> start;
+    for(int i = 0; i < n; ++i) {
+        start.push_back(m_data[i]);
     }
-    m_data.back() = tmp;
-    return *this;
+    for(int i = 0; i < sz - n; ++i) {
+        b.m_data[i] = b.m_data[(i + n) % sz];
+    }
+    for(int i = 0; i < n; ++i) {
+        b.m_data[sz - n + i] = start[i];
+    }
+    return b;
 }
 
 Bytestring Bytestring::circularRightShift(int n) {
-    int sz = m_data.size();
+    Bytestring b(*this);
+    int sz = b.m_data.size();
+    if (!sz) return b;
     n %= sz;
-    std::byte tmp(m_data[(sz + sz - n - 1) % sz]);
-    for(int i = 0; i < sz - 1; ++i) {
-        m_data[i] = m_data[(sz + i - n) % sz];
+    // Save the first n because they will be overwritten.
+    std::vector<std::byte> start;
+    for(int i = sz - 1; i >= sz - n; --i) {
+        start.push_back(b.m_data[i]);
     }
-    m_data.back() = tmp;
-    return *this;
+    for(int i = sz - 1; i >= n; --i) {
+        b.m_data[i] = b.m_data[(i - n) % sz];
+    }
+    for(int i = n - 1; i >= 0; --i) {
+        b.m_data[i] = start[n - i - 1];
+    }
+    return b;
 }
 
 std::string Bytestring::toHexString() {
@@ -108,4 +124,8 @@ Bytestring Bytestring::substring(int i, int sz) {
 void Bytestring::extend(Bytestring &other) {
     assert(m_base == other.m_base);
     m_data.insert(m_data.end(), other.m_data.begin(), other.m_data.end());
+}
+
+void Bytestring::extend(std::byte &other) {
+    m_data.push_back(other);
 }

@@ -28,7 +28,37 @@ namespace utils {
         }
         return dist;
     }
+    inline int PolyAdd(int a, int b) { return a ^ b; }
+    inline int PolyMult(int a, int b) {
+        int c = 0;
+        for(int i = 0; i < 31; ++i) {
+            if ((b >> i) & 1) {
+                c = PolyAdd(c, a << i);
+            }
+        }
+        // Rough check to try and catch when we multiply numbers that are too big.
+        assert(!(c >> 31));
+        return c;
+    }
 
+    // Taken from https://en.wikipedia.org/wiki/Rijndael_MixColumns
+    inline std::byte GalMult(std::byte a, std::byte b) { // Galois Field (256) Multiplication of two Bytes
+        int A = int(a);
+        int B = int(b);
+        int P = 0;
+        for (int counter = 0; counter < 8; ++counter) {
+            if ((B & 1) != 0) {
+                P ^= A;
+            }
+            bool hi_bit_set = (A & 0x80) != 0;
+            A <<= 1;
+            if (hi_bit_set) {
+                A ^= 0x1B; /* x^8 + x^4 + x^3 + x + 1 */
+            }
+            B >>= 1;
+        }
+        return std::byte(P);
+    }
 } /* utils */
 
 #endif /* UTILS */
