@@ -29,7 +29,7 @@ Bytestring::Bytestring(int base, Bytestring &other)
     }
 }
 
-Bytestring::Bytestring(int base, std::vector<std::byte> &data) 
+Bytestring::Bytestring(int base, const std::vector<std::byte> &data) 
     : m_base(base), m_data(data) {}
 
 Bytestring BytestringFromHex(std::string hexString) {
@@ -126,7 +126,7 @@ void Bytestring::extend(Bytestring &other) {
     m_data.insert(m_data.end(), other.m_data.begin(), other.m_data.end());
 }
 
-void Bytestring::extend(std::byte &other) {
+void Bytestring::extend(const std::byte &other) {
     m_data.push_back(other);
 }
 

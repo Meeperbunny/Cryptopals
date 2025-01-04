@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <string>
 #include <assert.h>
+#include <fstream>
 
 #include "lib/bytestring.h"
 
@@ -58,6 +59,17 @@ namespace utils {
             B >>= 1;
         }
         return std::byte(P);
+    }
+
+    inline std::string StringFromFile(std::string path) {
+        std::ifstream fin(path);
+        assert(fin.is_open());
+
+        std::string s{}, line;
+        while(std::getline(fin, line)) {
+            s += line;
+        }
+        return s;
     }
 } /* utils */
 

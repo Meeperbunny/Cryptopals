@@ -204,7 +204,7 @@ void aes128::decodeBlock(aes128::Block &b, std::vector<Bytestring> &keys) {
     return;
 }
 
-std::vector<aes128::Block> bytestringToBlockVector(Bytestring &text) {
+std::vector<aes128::Block> aes128::bytestringToBlockVector(const Bytestring &text) {
     std::vector<aes128::Block> blocks;
     for(int i = 0, cnt = 0; i < text.size(); ++i) {
         if (cnt == 0) {
@@ -216,7 +216,7 @@ std::vector<aes128::Block> bytestringToBlockVector(Bytestring &text) {
     return blocks;
 }
 
-Bytestring blockVectorToBytestring(std::vector<aes128::Block> &blocks) {
+Bytestring aes128::blockVectorToBytestring(const std::vector<aes128::Block> &blocks) {
     Bytestring encoded;
     for(auto &block : blocks) {
         for(int row = 0; row < aes128::blockSize; ++row) {
@@ -240,7 +240,7 @@ Bytestring aes128::Encode(Bytestring &text, Bytestring key) {
         aes128::encodeBlock(block, keys);
     }
     // Now unpack back into a bytestring.
-    return blockVectorToBytestring(blocks);
+    return aes128::blockVectorToBytestring(blocks);
 }
 
 Bytestring aes128::Decode(Bytestring &text, Bytestring key) {
@@ -255,5 +255,5 @@ Bytestring aes128::Decode(Bytestring &text, Bytestring key) {
         aes128::decodeBlock(block, keys);
     }
     // Now unpack back into a bytestring.
-    return blockVectorToBytestring(blocks);
+    return aes128::blockVectorToBytestring(blocks);
 }
