@@ -139,9 +139,19 @@ void Challenge4() {
     std::cout << std::endl;
 }
 
+void Challenge5() {
+    auto m = utils::MapFromString("email=foo@bar.com&uid=10&role=user");
+    std::cout << "{" << std::endl;
+    for(auto &[k, v] : m) {
+        std::cout << "\t" << k << ": " << v << std::endl;
+    }
+    std::cout << "}" << std::endl;
+}
+
 int main() {
     Challenge1();
     Challenge2();
     Challenge3();
     Challenge4();
+    Challenge5();
 }
