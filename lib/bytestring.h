@@ -13,13 +13,14 @@ public:
     Bytestring();
     Bytestring(int base);
     Bytestring(int base, int size);
-    Bytestring(int base, Bytestring &other);
+    Bytestring(int base, const Bytestring &other);
     Bytestring(int base, const std::vector<std::byte> &data);
     inline int base() const { return m_base; }
     inline size_t size() const { return m_data.size(); }
     std::byte& operator[](int i) { return m_data[i]; }
     std::byte const operator[](int i) const { return m_data[i]; }
-    Bytestring operator^(Bytestring &other);
+    Bytestring operator^(const Bytestring &other);
+    Bytestring operator+(const Bytestring &other);
     Bytestring circularLeftShift(int n);
     Bytestring circularRightShift(int n);
     std::string toHexString();
@@ -30,7 +31,7 @@ public:
     void pad(std::byte padding, int multiple);
 };
 
-Bytestring BytestringFromString(std::string s);
-Bytestring BytestringFromHex(std::string hexString);
+Bytestring BytestringFromString(const std::string &s);
+Bytestring BytestringFromHex(const std::string &hexString);
 
 #endif /* BYTESTRING */

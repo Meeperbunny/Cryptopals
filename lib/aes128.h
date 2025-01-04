@@ -24,6 +24,9 @@ namespace aes128 {
     Bytestring g(Bytestring b, int round);
     Bytestring blockVectorToBytestring(const std::vector<Block> &blocks);
     std::vector<Block> bytestringToBlockVector(const Bytestring &text);
+    Bytestring randomKey();
+    Bytestring randomModeKeyEncryption(const Bytestring &text);
+
     // AES STEPS
     void subByteEncode(Block &b);
     void subByteDecode(Block &b);

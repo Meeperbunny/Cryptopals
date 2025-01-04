@@ -13,7 +13,7 @@ Bytestring::Bytestring(int base)
 Bytestring::Bytestring(int base, int size) 
     : m_base(base), m_data(std::vector<std::byte>(size)) {}
 
-Bytestring::Bytestring(int base, Bytestring &other) 
+Bytestring::Bytestring(int base, const Bytestring &other) 
     : m_base(base) {
     m_data.clear();
     int cnt = 0;
@@ -41,7 +41,7 @@ Bytestring BytestringFromHex(std::string hexString) {
     return Bytestring(8, hexBytestring);
 }
 
-Bytestring BytestringFromString(std::string s) {
+Bytestring BytestringFromString(const std::string &s) {
     std::vector<std::byte> data;
     for(const auto &c : s) {
         data.push_back(std::byte(c));
@@ -49,7 +49,7 @@ Bytestring BytestringFromString(std::string s) {
     return Bytestring(8, data);
 }
 
-Bytestring Bytestring::operator^(Bytestring &other) {
+Bytestring Bytestring::operator^(const Bytestring &other) {
     Bytestring a(8, *this), b(8, other);
     if (a.size() < b.size()) std::swap(a, b);
 
@@ -58,6 +58,14 @@ Bytestring Bytestring::operator^(Bytestring &other) {
     }
 
     return a;
+}
+
+Bytestring Bytestring::operator+(const Bytestring &other) {
+    Bytestring ret(m_base);
+    assert(m_base == other.m_base);
+    ret.m_data.insert(ret.m_data.end(), m_data.begin(), m_data.end());
+    ret.m_data.insert(ret.m_data.end(), other.m_data.begin(), other.m_data.end());
+    return ret;
 }
 
 Bytestring Bytestring::circularLeftShift(int n) {

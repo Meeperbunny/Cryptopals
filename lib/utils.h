@@ -8,11 +8,12 @@
 #include <string>
 #include <assert.h>
 #include <fstream>
+#include <random>
 
 #include "lib/bytestring.h"
 
 namespace utils {
-
+    extern std::random_device rd;
     inline int HexCharToInt(char c) { return int(c >= 'a' ? c - 'a' + 10 : c - '0'); }
     inline char IntToHexChar(int i) { return int(i >= 10 ? i + 'a' - 10 : i + '0'); }
     inline std::byte HexToByte(char c) { return std::byte(HexCharToInt(c)); };
@@ -70,6 +71,20 @@ namespace utils {
             s += line;
         }
         return s;
+    }
+
+    inline std::byte RandomByte() {
+        return std::byte(utils::rd());
+    }
+    inline Bytestring RandomBytes(int sz) {
+        std::vector<std::byte> bytes(sz);
+        for(auto &byte : bytes)
+            byte = utils::RandomByte();
+        return Bytestring(8, bytes);
+    }
+    inline int UniformInt(int a, int b) {
+        std::uniform_int_distribution<> dist(a, b);
+        return dist(utils::rd);
     }
 } /* utils */
 

@@ -7,6 +7,8 @@
 #include <vector>
 #include <cstddef>
 #include <assert.h>
+#include <random>
+#include <algorithm>
 
 std::vector<std::byte> aes128::sbox{};
 std::vector<std::byte> aes128::isbox{};
@@ -98,6 +100,10 @@ Bytestring aes128::g(Bytestring b, int round) {
     }
     // Rounding constant.
     return aes128::roundConstant(round) ^ bshifted;
+}
+
+Bytestring aes128::randomKey() {
+    return utils::RandomBytes(16);
 }
 
 // Maps every byte through sbox.
@@ -305,3 +311,18 @@ Bytestring aes128::DecodeCBC(const Bytestring &text, Bytestring key, Bytestring 
     return aes128::blockVectorToBytestring(blocks);
 }
 
+Bytestring aes128::randomModeKeyEncryption(const Bytestring &text) {
+    std::string mode = utils::UniformInt(0, 1) ? "ECB" : "CBC";
+    auto key = aes128::randomKey();
+    // Pad the text.
+    auto paddedText = utils::RandomBytes(utils::UniformInt(5, 10)) +
+        text + utils::RandomBytes(utils::UniformInt(5, 10));
+    if (mode == "ECB") {
+        return aes128::EncodeECB(paddedText, key);
+    }
+    if (mode == "CBC") {
+        auto IV = Bytestring(8, std::vector<std::byte>(16, std::byte(0x00)));
+        return aes128::EncodeCBC(paddedText, key, IV);
+    }
+    return {};
+}
