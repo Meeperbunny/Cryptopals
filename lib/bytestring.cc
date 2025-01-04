@@ -129,3 +129,9 @@ void Bytestring::extend(Bytestring &other) {
 void Bytestring::extend(std::byte &other) {
     m_data.push_back(other);
 }
+
+void Bytestring::pad(std::byte padding, int multiple) {
+    while(m_data.size() % multiple) {
+        m_data.push_back(padding);
+    }
+}

@@ -26,6 +26,7 @@ public:
     Bytestring substring(int i, int sz);
     void extend(Bytestring &other);
     void extend(std::byte &other);
+    void pad(std::byte padding, int multiple);
 };
 
 Bytestring BytestringFromString(std::string s);
