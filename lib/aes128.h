@@ -37,12 +37,12 @@ namespace aes128 {
     void decodeBlock(Block &b, std::vector<Bytestring> &expandedKeys);
 
     // ECB Mode
-    Bytestring EncodeECB(Bytestring &text, Bytestring key);
-    Bytestring DecodeECB(Bytestring &text, Bytestring key);
+    Bytestring EncodeECB(const Bytestring &text, Bytestring key);
+    Bytestring DecodeECB(const Bytestring &text, Bytestring key);
 
     // CBC Mode
-    Bytestring EncodeCBC(Bytestring &text, Bytestring key, Bytestring IV);
-    Bytestring DecodeCBC(Bytestring &text, Bytestring key, Bytestring IV);
+    Bytestring EncodeCBC(const Bytestring &text, Bytestring key, Bytestring IV);
+    Bytestring DecodeCBC(const Bytestring &text, Bytestring key, Bytestring IV);
 };
 
 #endif /* AES128 */

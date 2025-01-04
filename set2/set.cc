@@ -20,15 +20,26 @@ void Challenge1() {
 }
 
 void Challenge2() {
-    std::string s = utils::StringFromFile("C:/Users/Ian McKibben/Cryptopals/set2/10.txt");
-    auto encoded = base64::Decode(s);
     auto key = BytestringFromString("YELLOW SUBMARINE");
     auto IV = Bytestring(8, std::vector<std::byte>(16, std::byte(0x00)));
 
+    // Check that it works before opening file.
+    std::string cbcTest = "ABCDEFGHIJKLMNOPABCDEFGHIJKLMNOP";
+    assert(cbcTest == aes128::DecodeCBC(
+            aes128::EncodeCBC(BytestringFromString(cbcTest), key, IV),
+            key,
+            IV
+        ).toAsciiString()
+    );
+
+    std::string s = utils::StringFromFile("C:/Users/Ian McKibben/Cryptopals/set2/10.txt");
+    auto encoded = base64::Decode(s);
+
     auto bs = aes128::DecodeCBC(encoded, key, IV);
+    std::string decoded = bs.toAsciiString();
 
     std::cout << "Challenge 2 result:" << std::endl;
-    std::cout << bs.toAsciiString() << std::endl;
+    std::cout << decoded << std::endl;
 }
 
 int main() {
