@@ -6,6 +6,7 @@
 #include <fstream>
 #include <limits.h>
 #include <iterator>
+#include <map>
 
 #include "lib/bytestring.h"
 #include "lib/base64.h"
@@ -193,6 +194,30 @@ void Challenge7() {
     std::cout << decoded.toAsciiString() << std::endl;
 }
 
+void Challenge8() {
+    std::ifstream fin("C:/Users/Ian McKibben/Cryptopals/set1/8.txt");
+    assert(fin.is_open());
+
+    std::string line;
+    int lineCount = 0;
+    std::map<int, std::pair<int, std::string>> maxCollisionsToString;
+    while(std::getline(fin, line)) {
+        ++lineCount;
+        // What should I look at? Let's look at block collisions?
+        std::unordered_map<std::string, int> hexCount;
+        int maxCount = 0;
+        for(int i = 0; i < line.size(); i += 32) {
+            ++hexCount[line.substr(i, 32)];
+            maxCount = std::max(maxCount, hexCount[line.substr(i, 32)]);
+        }
+        maxCollisionsToString[maxCount] = {lineCount, line};
+    }
+    auto &[cnt, p] = *maxCollisionsToString.rbegin();
+    auto &[lc, s] = p;
+    std::cout << "Challenge 8 result:" << std::endl;
+    std::cout << "Line " << lc << " has " << cnt << " block collisions. Hex data is:\n\t" << s << std::endl;
+}
+
 int main() {
     Challenge1();
     Challenge2();
@@ -201,4 +226,5 @@ int main() {
     Challenge5();
     Challenge6();
     Challenge7();
+    Challenge8();
 }
