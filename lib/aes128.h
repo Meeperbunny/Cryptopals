@@ -27,21 +27,22 @@ namespace aes128 {
     // AES STEPS
     void subByteEncode(Block &b);
     void subByteDecode(Block &b);
-
     void shiftRowEncode(Block &b);
     void shiftRowDecode(Block &b);
-
     void mixColumnsEncode(Block &b);
     void mixColumnsDecode(Block &b);
-
     std::vector<Bytestring> expandKeys(Bytestring &key);
     void addRoundKey(aes128::Block &b, Bytestring &key);
-
     void encodeBlock(Block &b, std::vector<Bytestring> &expandedKeys);
     void decodeBlock(Block &b, std::vector<Bytestring> &expandedKeys);
 
-    Bytestring Encode(Bytestring &text, Bytestring key);
-    Bytestring Decode(Bytestring &text, Bytestring key);
+    // ECB Mode
+    Bytestring EncodeECB(Bytestring &text, Bytestring key);
+    Bytestring DecodeECB(Bytestring &text, Bytestring key);
+
+    // CBC Mode
+    Bytestring EncodeCBC(Bytestring &text, Bytestring key, Bytestring IV);
+    Bytestring DecodeCBC(Bytestring &text, Bytestring key, Bytestring IV);
 };
 
 #endif /* AES128 */

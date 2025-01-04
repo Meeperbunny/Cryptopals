@@ -228,7 +228,7 @@ Bytestring aes128::blockVectorToBytestring(const std::vector<aes128::Block> &blo
     return encoded;
 }
 
-Bytestring aes128::Encode(Bytestring &text, Bytestring key) {
+Bytestring aes128::EncodeECB(Bytestring &text, Bytestring key) {
     assert(text.base() == 8 && key.base() == 8);
     // Seperate it into 128-bit blocks.
     auto blocks = bytestringToBlockVector(text);
@@ -243,7 +243,7 @@ Bytestring aes128::Encode(Bytestring &text, Bytestring key) {
     return aes128::blockVectorToBytestring(blocks);
 }
 
-Bytestring aes128::Decode(Bytestring &text, Bytestring key) {
+Bytestring aes128::DecodeECB(Bytestring &text, Bytestring key) {
     assert(text.base() == 8 && key.base() == 8);
     // Seperate it into 128-bit blocks.
     auto blocks = bytestringToBlockVector(text);
@@ -257,3 +257,29 @@ Bytestring aes128::Decode(Bytestring &text, Bytestring key) {
     // Now unpack back into a bytestring.
     return aes128::blockVectorToBytestring(blocks);
 }
+
+Bytestring aes128::DecodeCBC(Bytestring &text, Bytestring key, Bytestring IV) {
+    // Seperate it into blocks.
+    auto blocks = aes128::bytestringToBlockVector(text);
+    // Get keys.
+    auto keys = aes128::expandKeys(key);
+    // Now that we have blocks, decode each, and xor with the IV on each.
+    auto lastBlock = IV;
+    for(auto &block : blocks) {
+        // Get the prev before any decryption.
+        auto nextBlock = aes128::blockVectorToBytestring({block});
+
+        aes128::decodeBlock(block, keys);
+
+        // XOR the block after because we are decrypting.
+        auto currentBytestring = aes128::blockVectorToBytestring({block});
+        currentBytestring = currentBytestring ^ lastBlock;
+        block = aes128::bytestringToBlockVector(currentBytestring)[0];
+
+        // Set the last block
+        lastBlock = nextBlock;
+    }
+    // Now unpack back into a bytestring.
+    return aes128::blockVectorToBytestring(blocks);
+}
+

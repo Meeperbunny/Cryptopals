@@ -22,32 +22,11 @@ void Challenge1() {
 void Challenge2() {
     std::string s = utils::StringFromFile("C:/Users/Ian McKibben/Cryptopals/set2/10.txt");
     auto encoded = base64::Decode(s);
-
     auto key = BytestringFromString("YELLOW SUBMARINE");
     auto IV = Bytestring(8, std::vector<std::byte>(16, std::byte(0x00)));
 
-    // Seperate it into blocks.
-    auto blocks = aes128::bytestringToBlockVector(encoded);
-    // Get keys.
-    auto keys = aes128::expandKeys(key);
-    // Now that we have blocks, decode each, and xor with the IV on each.
-    auto lastBlock = IV;
-    for(auto &block : blocks) {
-        // Get the prev before any decryption.
-        auto nextBlock = aes128::blockVectorToBytestring({block});
+    auto bs = aes128::DecodeCBC(encoded, key, IV);
 
-        aes128::decodeBlock(block, keys);
-
-        // XOR the block after because we are decrypting.
-        auto currentBytestring = aes128::blockVectorToBytestring({block});
-        currentBytestring = currentBytestring ^ lastBlock;
-        block = aes128::bytestringToBlockVector(currentBytestring)[0];
-
-        // Set the last block
-        lastBlock = nextBlock;
-    }
-    // Now unpack back into a bytestring.
-    auto bs = aes128::blockVectorToBytestring(blocks);
     std::cout << "Challenge 2 result:" << std::endl;
     std::cout << bs.toAsciiString() << std::endl;
 }
