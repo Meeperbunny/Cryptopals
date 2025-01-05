@@ -8,6 +8,8 @@
 
 namespace aes128 {
     const int blockSize = 4;
+    const int rounds = 10;
+    constexpr auto padding = std::byte(0x04);
     typedef std::vector<Bytestring> Block;
     inline Block emptyBlock() {
         auto emptyVec = std::vector(4, std::byte{});
@@ -18,7 +20,6 @@ namespace aes128 {
     void initISbox();
     std::byte sboxGet(std::byte);
     std::byte isboxGet(std::byte);
-    const int rounds = 10;
     Bytestring nextRoundKey(Bytestring &prevKey, int round);
     Bytestring roundConstant(int round);
     Bytestring g(Bytestring b, int round);
@@ -26,6 +27,7 @@ namespace aes128 {
     std::vector<Block> bytestringToBlockVector(const Bytestring &text);
     Bytestring randomKey();
     Bytestring randomModeKeyEncryption(const Bytestring &text);
+    Bytestring removePadding(const Bytestring &b);
 
     // AES STEPS
     void subByteEncode(Block &b);

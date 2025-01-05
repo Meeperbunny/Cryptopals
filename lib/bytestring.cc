@@ -32,7 +32,7 @@ Bytestring::Bytestring(int base, const Bytestring &other)
 Bytestring::Bytestring(int base, const std::vector<std::byte> &data) 
     : m_base(base), m_data(data) {}
 
-Bytestring BytestringFromHex(std::string hexString) {
+Bytestring BytestringFromHex(const std::string &hexString) {
     std::vector<std::byte> data;
     for(const auto &c : hexString) {
         data.push_back(utils::HexToByte(c));
@@ -123,7 +123,7 @@ std::string Bytestring::toAsciiString() {
     return s;
 }
 
-Bytestring Bytestring::substring(int i, int sz) {
+Bytestring Bytestring::substring(int i, int sz) const {
     assert(i + sz <= m_data.size());
     std::vector<std::byte> data(m_data.begin() + i, m_data.begin() + i + sz);
     return Bytestring(m_base, data);

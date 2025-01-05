@@ -88,22 +88,6 @@ namespace utils {
         std::uniform_int_distribution<> dist(a, b);
         return dist(utils::rd);
     }
-    inline std::unordered_map<std::string, std::string> MapFromString(std::string s) {
-        char delim = '&';
-        std::vector<std::string> fields;
-        std::stringstream ss(s);
-        std::unordered_map<std::string, std::string> m;
-        for (std::string token; std::getline(ss, token, delim);) {
-            fields.push_back(token);
-        }
-        for(auto &field : fields) {
-            assert(count(field.begin(), field.end(), '=') == 1);
-            int ind = field.find('=');
-            assert(ind + 1 < field.size());
-            m.insert({field.substr(0, ind), field.substr(ind + 1)});
-        }
-        return m;
-    }
 } /* utils */
 
 #endif /* UTILS */
