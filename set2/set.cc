@@ -280,7 +280,7 @@ void Challenge14() {
             std::string toInsert = paddingChar + toReplicate + padding;
             // We will run this multiple times until the confidence interval is hit.
             const double confidence = 0.998;
-            // Assume chance of getting the right offset is around 1/16.
+            // Assume chance of getting the right offset is above 1/32.
             for(double chanceOfTrueMiss = 1.0; chanceOfTrueMiss > 1 - confidence; chanceOfTrueMiss *= 31.0 / 32.0) {
                 if (oracleFunction(prefixEncode, toInsert) == "ECB") {
                     found += char(guess);
