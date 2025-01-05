@@ -334,38 +334,18 @@ namespace credentials {
 }
 
 void Challenge16() {
-    // There are 2 blocks, then we will add 2. We will have a string that is the "target", and
-    // brute force the flipping for equal sign and semicolon.
-    std::string initialString = "0000000000000000SadminEtrueSaEaS";
+    // There are 2 blocks, then we will add 2. We will have a
+    // string that is the "target", and one that we change.
+    std::string initialString = "00000000000000000000000000000000";
+    std::string targetBytestring = ";admin=true;a=a;";
     Bytestring encrypted = credentials::EncryptString(initialString);
 
-    std::vector<int> equalIndices = {6, 13};
-    std::vector<int> semicolonIndices = {0, 11, 15};
-
-    // Try every combination of flipping the semicolon bytes and the equal sign bytes until we get true.
-    Bytestring malicious{};
-    bool found = false;
-    std::cout << "Brute forcing the masks..." << std::endl;
-    for(int equalMask = 0; equalMask < 256; ++equalMask) {
-        for(int semicolonMask = 0; semicolonMask < 256; ++semicolonMask) {
-            auto eByte = std::byte(equalMask);
-            auto sByte = std::byte(semicolonMask);
-
-            malicious = encrypted;
-            for(auto &i : equalIndices)
-                malicious[0x20 + i] ^= eByte;
-            for(auto &i : semicolonIndices)
-                malicious[0x20 + i] ^= sByte;
-            if (credentials::DecodeAndCheckIfAdmin(malicious)) {
-                std::cout << "Done!" << std::endl << "Found encoding that gives admin!" << std::endl;
-                found = true;
-                break;
-            }
-        }
-        if (found) break;
+    // Flip to the diff.
+    for(int i = 0; i < 16; ++i) {
+        encrypted[0x20 + i] ^= std::byte('0') ^ std::byte(targetBytestring[i]);
     }
 
-    bool isAdmin = credentials::DecodeAndCheckIfAdmin(malicious);
+    bool isAdmin = credentials::DecodeAndCheckIfAdmin(encrypted);
     std::cout << "Checking if is admin: " << (isAdmin ? "TRUE!" : "FALSE") << std::endl;
     assert(isAdmin);
 
