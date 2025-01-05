@@ -336,12 +336,12 @@ namespace credentials {
 void Challenge16() {
     // There are 2 blocks, then we will add 2. We will have a
     // string that is the "target", and one that we change.
-    std::string initialString = "00000000000000000000000000000000";
-    std::string targetBytestring = ";admin=true;a=a;";
+    std::string initialString = "000000000000000000000000000";
+    std::string targetBytestring = ";admin=true";
     Bytestring encrypted = credentials::EncryptString(initialString);
 
     // Flip to the diff.
-    for(int i = 0; i < 16; ++i) {
+    for(int i = 0; i < targetBytestring.size(); ++i) {
         encrypted[0x20 + i] ^= std::byte('0') ^ std::byte(targetBytestring[i]);
     }
 
@@ -353,13 +353,13 @@ void Challenge16() {
 }
 
 int main() {
-    const bool RUN_SLOW_TESTS = false;
+    const bool RUN_SLOW_CHALLENGES = false;
     Challenge9();
     Challenge10();
     Challenge11();
     Challenge12();
     Challenge13();
-    if (RUN_SLOW_TESTS) {
+    if (RUN_SLOW_CHALLENGES) {
         Challenge14();
     }
     else {
