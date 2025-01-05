@@ -336,13 +336,14 @@ namespace credentials {
 void Challenge16() {
     // There are 2 blocks, then we will add 2. We will have a
     // string that is the "target", and one that we change.
-    std::string initialString = "000000000000000000000000000";
+    char fillerChar = '0';
     std::string targetBytestring = ";admin=true";
+    std::string initialString = std::string(0x10, fillerChar) + std::string(targetBytestring.size(), fillerChar);
     Bytestring encrypted = credentials::EncryptString(initialString);
 
     // Flip to the diff.
     for(int i = 0; i < targetBytestring.size(); ++i) {
-        encrypted[0x20 + i] ^= std::byte('0') ^ std::byte(targetBytestring[i]);
+        encrypted[0x20 + i] ^= std::byte(fillerChar) ^ std::byte(targetBytestring[i]);
     }
 
     bool isAdmin = credentials::DecodeAndCheckIfAdmin(encrypted);
