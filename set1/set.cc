@@ -19,7 +19,7 @@ void Challenge1() {
     std::string input = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
     std::string answer = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
 
-    auto bs = BytestringFromHex(input);
+    auto bs = Bytestring::FromHex(input);
     std::string s = base64::Encode(bs, false);
 
     assert(s == answer);
@@ -32,8 +32,8 @@ void Challenge2() {
     std::string inputB = "686974207468652062756c6c277320657965";
     std::string answer = "746865206b696420646f6e277420706c6179";
 
-    auto bsa = BytestringFromHex(inputA);
-    auto bsb = BytestringFromHex(inputB);
+    auto bsa = Bytestring::FromHex(inputA);
+    auto bsb = Bytestring::FromHex(inputB);
 
     std::string s = (bsa ^ bsb).toHexString();
 
@@ -45,7 +45,7 @@ void Challenge2() {
 void Challenge3() {
     std::string input = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
 
-    std::cout << "Challenge three result string:\n\t" << "\"" << std::get<0>(frequency::singleCharXORDecrypt(BytestringFromHex(input))) << "\"" << std::endl;
+    std::cout << "Challenge three result string:\n\t" << "\"" << std::get<0>(frequency::singleCharXORDecrypt(Bytestring::FromHex(input))) << "\"" << std::endl;
 }
 
 void Challenge4() {
@@ -56,7 +56,7 @@ void Challenge4() {
     std::string bests;
     double bestscore = DBL_MAX;
     while(std::getline(fin, line)) {
-        auto [s, c, score] = frequency::singleCharXORDecrypt(BytestringFromHex(line));
+        auto [s, c, score] = frequency::singleCharXORDecrypt(Bytestring::FromHex(line));
         if (!s.empty()) {
             if (score < bestscore) {
                 bestscore = score;
@@ -70,22 +70,22 @@ void Challenge4() {
 void Challenge5() {
     std::string line = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
 
-    Bytestring key = BytestringFromString("ICE");
+    Bytestring key = Bytestring::FromString("ICE");
 
     std::cout << "Challenge five result hex:" << std::endl;
-    auto bs = BytestringFromString(line);
+    auto bs = Bytestring::FromString(line);
     auto encoded = repeatingxor::Transform(bs, key);
     std::cout << '\t' << encoded.toHexString() << std::endl;
 }
 
 void Challenge6() {
     // Testing hamming distance.
-    int hammingTest = utils::HammingDistance(BytestringFromString("this is a test"), BytestringFromString("wokka wokka!!!"));
+    int hammingTest = utils::HammingDistance(Bytestring::FromString("this is a test"), Bytestring::FromString("wokka wokka!!!"));
     assert(hammingTest == 37);
     std::cout << "[TEST] Hamming distance works!" << std::endl;
     // Testing base64 encode and decode.
     std::string tester = "this is a test!";
-    assert(base64::Decode(base64::Encode(BytestringFromString(tester))).toAsciiString() == tester);
+    assert(base64::Decode(base64::Encode(Bytestring::FromString(tester))).toAsciiString() == tester);
     std::cout << "[TEST] Base64 works!" << std::endl;
 
     std::ifstream fin("C:/Users/Ian McKibben/Cryptopals/set1/6.txt");
@@ -135,7 +135,7 @@ void Challenge6() {
             candidateKey += c;
         }
 
-        auto text = repeatingxor::Transform(decoded, BytestringFromString(candidateKey)).toAsciiString();
+        auto text = repeatingxor::Transform(decoded, Bytestring::FromString(candidateKey)).toAsciiString();
         frequency::FrequencyMap fm(text);
         if (fm.distance() < bestdistance) {
             bestdistance = fm.distance();
@@ -168,8 +168,8 @@ void Challenge7() {
     std::string testKey = "Thats my Kung Fu";
     std::string testText = "Two One Nine Two";
 
-    auto testKeyBs = BytestringFromString(testKey);
-    auto testTextBs = BytestringFromString(testText);
+    auto testKeyBs = Bytestring::FromString(testKey);
+    auto testTextBs = Bytestring::FromString(testText);
 
     auto testEncoded = aes128::EncodeECB(testTextBs, testKeyBs);
     assert(testEncoded.toHexString() == "29c3505f571420f6402299b31a02d73a");
@@ -179,7 +179,7 @@ void Challenge7() {
     assert(testDecoded.toAsciiString() == testText);
     std::cout << "[TEST] Decode works!" << std::endl;
 
-    auto keyBs = BytestringFromString("YELLOW SUBMARINE");
+    auto keyBs = Bytestring::FromString("YELLOW SUBMARINE");
     
     std::ifstream fin("C:/Users/Ian McKibben/Cryptopals/set1/7.txt");
     assert(fin.is_open());

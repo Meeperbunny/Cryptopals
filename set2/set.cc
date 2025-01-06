@@ -11,7 +11,7 @@
 
 void Challenge9() {
     std::string s = "YELLOW SUBMARINE";
-    auto b = BytestringFromString(s);
+    auto b = Bytestring::FromString(s);
     b.pad(std::byte(0x04), 20);
     for(int i = 16; i < 20; ++i) {
         assert(b[i] == std::byte(0x04));
@@ -22,13 +22,13 @@ void Challenge9() {
 }
 
 void Challenge10() {
-    auto key = BytestringFromString("YELLOW SUBMARINE");
+    auto key = Bytestring::FromString("YELLOW SUBMARINE");
     auto IV = Bytestring(8, std::vector<std::byte>(16, std::byte(0x00)));
 
     // Check that it works before opening file.
     std::string cbcTest = "ABCDEFGHIJKLMNOPABCDEFGHIJKLMNOP";
     assert(cbcTest == aes128::DecodeCBC(
-            aes128::EncodeCBC(BytestringFromString(cbcTest), key, IV),
+            aes128::EncodeCBC(Bytestring::FromString(cbcTest), key, IV),
             key,
             IV
         ).toAsciiString()
@@ -48,7 +48,7 @@ void Challenge11() {
     // Create some function for checking if given a Bytestring it is ECB or CBC.
     auto oracleFunction = [](std::function<Bytestring(const Bytestring&)> func) -> std::string {
         // Feed the function repeating text and see if there are repeats.
-        auto malicious = BytestringFromString(std::string(16 * 32, 'A'));
+        auto malicious = Bytestring::FromString(std::string(16 * 32, 'A'));
         std::unordered_map<std::string, int> frequencyMap;
         auto blocks = aes128::bytestringToBlockVector(func(malicious));
         for(auto &block : blocks) {
@@ -73,7 +73,7 @@ void Challenge12() {
     std::string secretMessage = base64::Decode(utils::StringFromFile("C:/Users/Ian McKibben/Cryptopals/set2/12.txt")).toAsciiString();
 
     auto paddedEncode = [&](const std::string &text) -> Bytestring {
-        auto paddedText = BytestringFromString(text + secretMessage);
+        auto paddedText = Bytestring::FromString(text + secretMessage);
         return aes128::EncodeECB(paddedText, secretKey);
     };
     
@@ -171,7 +171,7 @@ namespace profile {
     Bytestring EncodedFromEmail(const std::string &email) {
         if (profile::key.empty()) profile::key = aes128::randomKey();
         auto s = profile::profileFor(email);
-        return aes128::EncodeECB(BytestringFromString(s), profile::key);
+        return aes128::EncodeECB(Bytestring::FromString(s), profile::key);
     }
 
     std::unordered_map<std::string, std::string> DecodeProfile(const Bytestring &profile) {
@@ -238,7 +238,7 @@ void Challenge14() {
 
     auto prefixEncode = [&](const std::string &text) -> Bytestring {
         auto randomPrefix = utils::RandomBytes(utils::UniformInt(6, 24));
-        return aes128::EncodeECB(randomPrefix + BytestringFromString(text + secretMessage), secretKey);
+        return aes128::EncodeECB(randomPrefix + Bytestring::FromString(text + secretMessage), secretKey);
     };
 
     // Idea here is we can just run it a bunch of times and if it doesn't work after a lot of times, then the guess
@@ -299,11 +299,11 @@ void Challenge14() {
 
 void Challenge15() {
     std::string test = "ICE ICE BABY";
-    auto bs = BytestringFromString(test);
+    auto bs = Bytestring::FromString(test);
 
-    auto t1 = bs + BytestringFromHex("04040404");
-    auto t2 = bs + BytestringFromHex("05050505");
-    auto t3 = bs + BytestringFromHex("01020304");
+    auto t1 = bs + Bytestring::FromHex("04040404");
+    auto t2 = bs + Bytestring::FromHex("05050505");
+    auto t3 = bs + Bytestring::FromHex("01020304");
 
     assert(aes128::removePadding(t1).size() == 12);
     assert(aes128::removePadding(t2).size() == 16);
@@ -322,7 +322,7 @@ namespace credentials {
         }
         const std::string prefix = "comment1=cooking%20MCs;userdata=";
         const std::string suffix = ";comment2=%20like%20a%20pound%20of%20bacon";
-        auto bs = BytestringFromString(prefix + filtered + suffix);
+        auto bs = Bytestring::FromString(prefix + filtered + suffix);
         bs.pad(aes128::padding, 16);
         return aes128::EncodeCBC(bs, credentials::secretKey, credentials::secretIV);
     }

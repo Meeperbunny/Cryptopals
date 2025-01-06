@@ -31,9 +31,8 @@ public:
     void extend(Bytestring &other);
     void extend(const std::byte &other);
     void pad(std::byte padding, int multiple);
+    static Bytestring FromString(const std::string &s);
+    static Bytestring FromHex(const std::string &hexString);
 };
-
-Bytestring BytestringFromString(const std::string &s);
-Bytestring BytestringFromHex(const std::string &hexString);
 
 #endif /* BYTESTRING */
