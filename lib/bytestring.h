@@ -19,6 +19,7 @@ public:
     inline size_t size() const { return m_data.size(); }
     inline bool empty() const { return m_data.empty(); }
     inline std::byte back() const { return m_data.back(); }
+    inline void pop_back() { return m_data.pop_back(); }
     std::byte& operator[](int i) { return m_data[i]; }
     std::byte const operator[](int i) const { return m_data[i]; }
     Bytestring operator^(const Bytestring &other);
@@ -30,7 +31,6 @@ public:
     Bytestring substring(int i, int sz) const;
     void extend(Bytestring &other);
     void extend(const std::byte &other);
-    void pad(std::byte padding, int multiple);
     static Bytestring FromString(const std::string &s);
     static Bytestring FromHex(const std::string &hexString);
 };

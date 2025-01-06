@@ -2,6 +2,7 @@
 #include "lib/aes128.h"
 #include "lib/bytestring.h"
 #include "lib/utils.h"
+#include "lib/padding.h"
 
 #include <stdint.h>
 #include <vector>
@@ -238,7 +239,7 @@ Bytestring aes128::EncodeECB(const Bytestring &text, Bytestring key) {
     assert(text.base() == 8 && key.base() == 8);
     // Pad the string.
     auto paddedText(text);
-    paddedText.pad(std::byte(0x04), 16);
+    PKCS::Pad(paddedText);
     // Seperate it into 128-bit blocks.
     auto blocks = bytestringToBlockVector(paddedText);
     // Get keys.
@@ -264,23 +265,17 @@ Bytestring aes128::DecodeECB(const Bytestring &text, Bytestring key) {
         aes128::decodeBlock(block, keys);
     }
     // Now unpack back into a padded bytestring.
-    auto paddedString = aes128::blockVectorToBytestring(blocks);
+    auto bs = aes128::blockVectorToBytestring(blocks);
 
-    // Remove the padding.
-    Bytestring decoded = paddedString;
-    for(int i = paddedString.size() - 1; i >= 0; --i) {
-        if (paddedString[i] != aes128::padding) {
-            decoded = paddedString.substring(0, i + 1);
-            break;
-        }
-    }
-    return decoded;
+    // Remove the padding and return.
+    PKCS::Unpad(bs);
+    return bs;
 }
 
 Bytestring aes128::EncodeCBC(const Bytestring &text, Bytestring key, Bytestring IV) {
     // Pad the string.
     auto paddedText(text);
-    paddedText.pad(std::byte(0x04), 16);
+    PKCS::Pad(paddedText);
     // Seperate it into blocks.
     auto blocks = aes128::bytestringToBlockVector(text);
     // Get keys.
@@ -324,17 +319,11 @@ Bytestring aes128::DecodeCBC(const Bytestring &text, Bytestring key, Bytestring 
         lastBlock = nextBlock;
     }
     // Now unpack back into a padded bytestring.
-    auto paddedString = aes128::blockVectorToBytestring(blocks);
+    auto bs = aes128::blockVectorToBytestring(blocks);
 
-    // Remove the padding.
-    Bytestring decoded = paddedString;
-    for(int i = paddedString.size() - 1; i >= 0; --i) {
-        if (paddedString[i] != aes128::padding) {
-            decoded = paddedString.substring(0, i + 1);
-            break;
-        }
-    }
-    return decoded;
+    // Remove the padding and return.
+    PKCS::Unpad(bs);
+    return bs;
 }
 
 Bytestring aes128::randomModeKeyEncryption(const Bytestring &text) {
@@ -351,16 +340,4 @@ Bytestring aes128::randomModeKeyEncryption(const Bytestring &text) {
         return aes128::EncodeCBC(paddedText, key, IV);
     }
     return {};
-}
-
-Bytestring aes128::removePadding(const Bytestring &b) {
-    // Checks if there is continuous string of padding followed by one at least 0x0a.
-    auto validChar = std::byte(0x0a);
-    for(int i = b.size() - 1; i >= 0; --i) {
-        if (b[i] >= validChar) {
-            return b.substring(0, i + 1);
-        }
-        if (b[i] != aes128::padding) break;
-    }
-    return b;
 }

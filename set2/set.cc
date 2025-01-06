@@ -8,11 +8,12 @@
 #include "lib/utils.h"
 #include "lib/base64.h"
 #include "lib/aes128.h"
+#include "lib/padding.h"
 
 void Challenge9() {
     std::string s = "YELLOW SUBMARINE";
     auto b = Bytestring::FromString(s);
-    b.pad(std::byte(0x04), 20);
+    PKCS::Pad(b, 20);
     for(int i = 16; i < 20; ++i) {
         assert(b[i] == std::byte(0x04));
     }
@@ -208,10 +209,12 @@ void Challenge13() {
 
     // Now we get the second part.
     std::string prefix = "email=";
-    std::string maliciousBlock = "admin";
+    std::string maliciousRole = "admin";
     int prefixPadding = 16 - prefix.size();
-    int blockPadding = 16 - maliciousBlock.size();
-    std::string adminTest = std::string(prefixPadding, 0x04) + maliciousBlock + std::string(blockPadding, 0x04);
+    // Get the string that would be the padding that should be added, then add it.
+    Bytestring maliciousWithPadding = Bytestring::FromString(maliciousRole);
+    PKCS::Pad(maliciousWithPadding);
+    std::string adminTest = std::string(prefixPadding, 'A') + maliciousWithPadding.toAsciiString();
 
     auto secondBytestring = profile::EncodedFromEmail(adminTest);
     // We only want the second block.
@@ -305,9 +308,13 @@ void Challenge15() {
     auto t2 = bs + Bytestring::FromHex("05050505");
     auto t3 = bs + Bytestring::FromHex("01020304");
 
-    assert(aes128::removePadding(t1).size() == 12);
-    assert(aes128::removePadding(t2).size() == 16);
-    assert(aes128::removePadding(t3).size() == 16);
+    PKCS::Unpad(t1);
+    PKCS::Unpad(t2);
+    PKCS::Unpad(t3);
+
+    assert(t1.size() == 12);
+    assert(t2.size() == 16);
+    assert(t3.size() == 16);
 
     std::cout << "Challenge 15 completed!" << std::endl;
 }
@@ -323,7 +330,7 @@ namespace credentials {
         const std::string prefix = "comment1=cooking%20MCs;userdata=";
         const std::string suffix = ";comment2=%20like%20a%20pound%20of%20bacon";
         auto bs = Bytestring::FromString(prefix + filtered + suffix);
-        bs.pad(aes128::padding, 16);
+        PKCS::Pad(bs);
         return aes128::EncodeCBC(bs, credentials::secretKey, credentials::secretIV);
     }
     bool DecodeAndCheckIfAdmin(const Bytestring &encoded) {
