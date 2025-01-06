@@ -68,6 +68,17 @@ Bytestring Bytestring::operator+(const Bytestring &other) {
     return ret;
 }
 
+bool Bytestring::operator==(const Bytestring &other) {
+    if (m_data.size() != other.size() ||
+        m_base != other.base()) return false;
+
+    for(int i = 0; i < this->size(); ++i) {
+        if (m_data[i] != m_data[i])
+            return false;
+    }
+    return true;
+}
+
 Bytestring Bytestring::circularLeftShift(int n) {
     Bytestring b(*this);
     int sz = b.m_data.size();

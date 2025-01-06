@@ -10,7 +10,7 @@ void PKCS::Pad(Bytestring &b, int multiple) {
 }
 
 void PKCS::Unpad(Bytestring &b, int multiple) {
-    if (b.size() % multiple != 0)
+    if (b.size() % multiple != 0 || b.empty())
         return;
     // Check if it has valid padding.
     int paddingCount = int(b.back());

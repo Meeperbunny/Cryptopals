@@ -24,6 +24,7 @@ public:
     std::byte const operator[](int i) const { return m_data[i]; }
     Bytestring operator^(const Bytestring &other);
     Bytestring operator+(const Bytestring &other);
+    bool operator==(const Bytestring &other);
     Bytestring circularLeftShift(int n);
     Bytestring circularRightShift(int n);
     std::string toHexString();
