@@ -5,12 +5,20 @@
 #include <vector>
 #include <assert.h>
 
+#include <iostream>
+
 bool PKCS::isValidPadding(const Bytestring &b) {
-    if (b.empty()) return false;
+    if (b.empty()) {
+        return false;
+    }
     int paddingCount = int(b.back());
-    if (paddingCount > b.size()) return false;
-    for(int i = b.size() - 1; i + paddingCount >= b.size(); --i) {
-        if (b[i] != b.back()) return false;
+    if (paddingCount > b.size()) {
+        return false;
+    }
+    for(int i = int(b.size()) - 1; i >= int(b.size()) - paddingCount; --i) {
+        if (b[i] != b.back()) {
+            return false;
+        }
     }
     return true;
 }

@@ -27,8 +27,8 @@ public:
     bool operator==(const Bytestring &other);
     Bytestring circularLeftShift(int n);
     Bytestring circularRightShift(int n);
-    std::string toHexString();
-    std::string toAsciiString();
+    std::string toHexString() const;
+    std::string toAsciiString() const;
     Bytestring substring(int i, int sz) const;
     void extend(Bytestring &other);
     void extend(const std::byte &other);

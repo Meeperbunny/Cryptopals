@@ -171,11 +171,11 @@ void Challenge7() {
     auto testKeyBs = Bytestring::FromString(testKey);
     auto testTextBs = Bytestring::FromString(testText);
 
-    auto testEncoded = aes128::EncodeECB(testTextBs, testKeyBs);
+    auto testEncoded = aes128::EncodeECB(testTextBs, testKeyBs, false);
     assert(testEncoded.toHexString() == "29c3505f571420f6402299b31a02d73a");
     std::cout << "[TEST] Encode works!" << std::endl;
 
-    auto testDecoded = aes128::DecodeECB(testEncoded, testKeyBs);
+    auto testDecoded = aes128::DecodeECB(testEncoded, testKeyBs, false);
     assert(testDecoded.toAsciiString() == testText);
     std::cout << "[TEST] Decode works!" << std::endl;
 

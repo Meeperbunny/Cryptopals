@@ -7,5 +7,5 @@ cc_binary(
         "//lib:lib",
         "@bazel_tools//tools/cpp/runfiles",
     ],
-    # data = glob(["*.txt"]),
+    data = glob(["*.txt"]),
 )

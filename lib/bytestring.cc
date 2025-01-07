@@ -117,7 +117,7 @@ Bytestring Bytestring::circularRightShift(int n) {
     return b;
 }
 
-std::string Bytestring::toHexString() {
+std::string Bytestring::toHexString() const {
     Bytestring b(4, *this);
     std::string hex{};
     for(int i = 0; i < b.size(); ++i) {
@@ -126,7 +126,7 @@ std::string Bytestring::toHexString() {
     return hex;
 }
 
-std::string Bytestring::toAsciiString() {
+std::string Bytestring::toAsciiString() const {
     std::string s{};
     for(int i = 0; i < m_data.size(); ++i) {
         s += std::to_integer<unsigned char>(m_data[i]);
