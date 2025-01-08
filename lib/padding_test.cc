@@ -1,6 +1,16 @@
 #include <gtest/gtest.h>
 #include "padding.h"
 
+TEST(PaddingTest, PKCSIsValid) {
+    EXPECT_EQ(PKCS::isValidPadding(Bytestring::FromHex("00093475893475934875938475840101")), true);
+    EXPECT_EQ(PKCS::isValidPadding(Bytestring::FromHex("00000002347239847293843743840202")), true);
+    EXPECT_EQ(PKCS::isValidPadding(Bytestring::FromHex("00000002347239847293843743841202")), false);
+    EXPECT_EQ(PKCS::isValidPadding(Bytestring::FromHex("00000000000000000000000600030303")), true);
+    EXPECT_EQ(PKCS::isValidPadding(Bytestring::FromHex("00000000000000000000000604040404")), true);
+    EXPECT_EQ(PKCS::isValidPadding(Bytestring::FromHex("00000000000000000000000005050505")), false);
+    EXPECT_EQ(PKCS::isValidPadding(Bytestring::FromHex("00000000000000000000000000000000")), false);
+}
+
 TEST(PaddingTest, PKCSPad) {
     Bytestring empty;
     PKCS::Pad(empty);

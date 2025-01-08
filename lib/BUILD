@@ -9,6 +9,7 @@ cc_library(
 cc_test(
     name = "padding_test",
     srcs = ["padding_test.cc"],
+    size = "small",
     deps = [
         ":lib",
         "@googletest//:gtest",

@@ -12,6 +12,7 @@ bool PKCS::isValidPadding(const Bytestring &b) {
         return false;
     }
     int paddingCount = int(b.back());
+    if (paddingCount == 0) return false;
     if (paddingCount > b.size()) {
         return false;
     }
