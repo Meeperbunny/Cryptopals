@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <iostream>
 #include <string>
+#include <set>
 #include <vector>
 #include <fstream>
 #include <utility>
@@ -29,17 +30,13 @@ void Challenge17() {
         std::string line = lines[utils::UniformInt(0, 9)];
         if (secretKey.empty())
             secretKey = aes128::randomKey();
-        
         // Decrypt line and pad.
         Bytestring b = base64::Decode(line);
-        // b = Bytestring::FromString("AAAAAAAAAAAAAAAAAA");
         Bytestring IV = utils::RandomBytes(16);
-
         return { aes128::EncodeCBC(b, secretKey, IV, true), IV };
     };
 
     auto HasValidPadding = [&](Bytestring b, Bytestring IV) -> bool {
-        // Decrypt line and pad.
         Bytestring decoded = aes128::DecodeCBC(b, secretKey, IV, false);
         return PKCS::isValidPadding(decoded);
     };
@@ -85,7 +82,6 @@ void Challenge17() {
                 int lastPaddingBytes = lastPadding;
                 int nextPadding = lastPadding + 1;
                 auto diff = std::byte(lastPadding ^ nextPadding);
-                std::cout << "LP " << lastPadding << ' ' << nextPadding << ' ' << int(diff) << std::endl;
                 // Update last bytes to xor to new one.
                 for(int i = 0; i < lastPaddingBytes; ++i) {
                     mask[toChangeOffset + 15 - i] ^= diff;
@@ -108,16 +104,7 @@ void Challenge17() {
                         }
                     }
                 }
-                std::cout << guessing << ": ";
-                if (theOne != -1) {
-                    std::cout << "Found " << theOne << std::endl;
-                }
-                else {
-                    theOne = 0;
-                    std::cout << "Not found" << std::endl;
-                }
                 mask[toChangeOffset + guessing] ^= std::byte(theOne);
-                std::cout << mask.toHexString() << std::endl;
             }
             // Once we guess all, the server side decoded is string(16, 0x10). If we xor with
             // 0x10, we will get the exact decoded text in our mask.
@@ -125,13 +112,19 @@ void Challenge17() {
             mask = mask ^ Bytestring(8, std::vector<std::byte>(16, std::byte(0x10)));
             answer = mask + answer;
         }
-        std::cout << answer.toHexString() << std::endl;
         PKCS::Unpad(answer);
         return answer.toAsciiString();
     };
 
     std::cout << "Challenge 17 result is:" << std::endl;
-    std::cout << GetOriginal() << std::endl;
+    std::set<std::string> answers;
+    while(answers.size() != 10) {
+        std::cout << "Found " << answers.size() << " out of 10..." << std::endl;
+        answers.insert(GetOriginal());
+    }
+    std::cout << "Found all answers! Reconstructed gives" << std::endl;
+    for(const auto &e : answers)
+        std::cout << e << std::endl;
 }
 
 int main() {
