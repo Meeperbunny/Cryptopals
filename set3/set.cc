@@ -127,6 +127,27 @@ void Challenge17() {
         std::cout << e << std::endl;
 }
 
+void Challenge18() {
+    std::string encrypted = "L77na/nrFsKvynd6HzOoG7GHTLXsTVu9qvY/2syLXzhPweyyMTJULu/6/kXX0KSvoOLSFQ==";
+    auto cyphertext = base64::Decode(encrypted);
+    auto key = Bytestring::FromString("YELLOW SUBMARINE");
+    
+    int counter = 0;
+    for(int i = 0; i < cyphertext.size(); i += 16) {
+        int sz = std::min(16, (int)cyphertext.size() - i);
+        auto substring = cyphertext.substring(i, sz);
+        auto counterBytes = Bytestring(8, 16);
+        counterBytes[8] = std::byte(counter);
+        auto keyStream = aes128::EncodeECB(counterBytes, key, false);
+        if (sz != 16)
+            keyStream = keyStream.substring(0, sz);
+        std::cout << (substring ^ keyStream).toAsciiString();
+        ++counter;
+    }
+    std::cout << std::endl;
+}
+
 int main() {
     Challenge17();
+    Challenge18();
 }
