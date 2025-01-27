@@ -147,7 +147,19 @@ void Challenge18() {
     std::cout << std::endl;
 }
 
+void Challenge19() {
+    std::string line;
+    std::ifstream fin("C:/Users/Ian McKibben/Cryptopals/set3/19.txt");
+    while(std::getline(fin, line)) {
+        // TODO: Encrypt here
+        auto decryptedLine = base64::Decode(line);
+        // auto encrypted = 
+    }
+    // TODO: Get the frequency of each byte, and make a byte -> char mapping inferred from byte distribution.
+}
+
 int main() {
     Challenge17();
     Challenge18();
+    Challenge19();
 }
